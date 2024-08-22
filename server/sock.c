@@ -71,7 +71,7 @@
 #  include <linux/types.h>
 # endif
 # include <linux/ipx.h>
-# ifdef SOL_IPX
+# if defined(SOL_IPX) && !defined(__ANDROID__)
 #  define HAS_IPX
 # endif
 #endif

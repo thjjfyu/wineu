@@ -1624,7 +1624,7 @@ static BOOL macho_search_and_load_file(struct process* pcs, const WCHAR* filenam
     {
         const WCHAR* fallback = process_getenv(pcs, L"DYLD_FALLBACK_LIBRARY_PATH");
         if (!fallback)
-            fallback = L"/usr/local/lib:/lib:/usr/lib";
+            fallback = L"/data/data/com.termux/files/usr/lib:/usr/local/lib:/lib:/usr/lib";
         ret = search_unix_path(p, fallback, macho_load_file_cb, &load_params);
     }
     if (!ret && p == filename)

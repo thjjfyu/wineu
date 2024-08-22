@@ -43,7 +43,8 @@ static const char *a_very_long_env_string =
  "/lib/mingw32/3.4.2/;"
  "/lib/;"
  "/usr/lib/mingw32/3.4.2/;"
- "/usr/lib/";
+ "/usr/lib/;"
+ "/data/data/com.termux/files/usr/lib/";
 
 static char ***(__cdecl *p__p__environ)(void);
 static WCHAR ***(__cdecl *p__p__wenviron)(void);

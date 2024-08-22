@@ -74,7 +74,7 @@
 #  define _POSIX_SPAWN_DISABLE_ASLR 0x0100
 # endif
 #endif
-#ifdef __ANDROID__
+#if defined(__ANDROID__) && ! defined(__TERMUX__)
 # include <jni.h>
 #endif
 extern char **environ;
@@ -438,7 +438,7 @@ static void init_paths( char *argv[] )
     if (!(build_dir = remove_tail( ntdll_dir, "/dlls/ntdll" )))
     {
         if (!(dll_dir = remove_tail( ntdll_dir, so_dir ))) dll_dir = ntdll_dir;
-#if (defined(__linux__) && !defined(__ANDROID__)) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
+#if (defined(__linux__) && !(defined(__ANDROID__) && ! defined(__TERMUX__))) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
         bin_dir = realpath_dirname( "/proc/self/exe" );
 #elif defined (__FreeBSD__) || defined(__DragonFly__)
         {
@@ -1823,7 +1823,7 @@ static void start_main_thread(void)
     server_init_process_done();
 }
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) && ! defined(__TERMUX__)
 
 #ifndef WINE_JAVA_CLASS
 #define WINE_JAVA_CLASS "org/winehq/wine/WineActivity"

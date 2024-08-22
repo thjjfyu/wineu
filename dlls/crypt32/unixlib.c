@@ -619,6 +619,7 @@ static const char * const CRYPT_knownLocations[] = {
  "/usr/local/share/certs/",
  "/etc/sfw/openssl/certs",
  "/etc/security/cacerts",  /* Android */
+ "/data/data/com.termux/files/usr/etc/tls" /* Termux */
 };
 
 static void load_root_certs(void)

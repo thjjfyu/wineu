@@ -677,10 +677,10 @@ static struct image_file_map* image_locate_build_id_target(const BYTE* id, unsig
     fmap_link = HeapAlloc(GetProcessHeap(), 0, sizeof(*fmap_link));
     if (!fmap_link) return NULL;
 
-    p = malloc(sizeof(L"/usr/lib/debug/.build-id/") +
+    p = malloc(sizeof(L"/data/data/com.termux/files/usr//lib/debug/.build-id/") +
                (idlen * 2 + 1) * sizeof(WCHAR) + sizeof(L".debug"));
     if (!p) goto fail;
-    wcscpy(p, L"/usr/lib/debug/.build-id/");
+    wcscpy(p, L"/data/data/com.termux/files/usr//lib/debug/.build-id/");
     z = p + wcslen(p);
     if (idlen)
     {
@@ -784,7 +784,7 @@ struct image_file_map* image_load_debugaltlink(struct image_file_map* fmap, stru
                 if (!ret)
                 {
                     dst = HeapAlloc(GetProcessHeap(), 0,
-                                    sizeof(L"/usr/lib/debug/.build-id/") + (3 + filename_len + idlen * 2) * sizeof(WCHAR));
+                                    sizeof(L"/data/data/com.termux/files/usr/lib/debug/.build-id/") + (3 + filename_len + idlen * 2) * sizeof(WCHAR));
                     if (dst)
                     {
                         WCHAR* p;
@@ -794,7 +794,7 @@ struct image_file_map* image_load_debugaltlink(struct image_file_map* fmap, stru
                          * where the alternate file is...
                          * so try both
                          */
-                        p = memcpy(dst, L"/usr/lib/debug/.build-id/", sizeof(L"/usr/lib/debug/.build-id/"));
+                        p = memcpy(dst, L"/data/data/com.termux/files/usr/lib/debug/.build-id/", sizeof(L"/data/data/com.termux/files/usr/lib/debug/.build-id/"));
                         p += wcslen(dst);
                         MultiByteToWideChar(CP_UNIXCP, 0, data, -1, p, filename_len);
                         ret = image_check_debug_link_gnu_id(dst, fmap_link, id, idlen);

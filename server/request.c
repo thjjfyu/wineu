@@ -657,15 +657,15 @@ static char *create_server_dir( int force )
 
     /* create the base directory if needed */
 
-#ifdef __ANDROID__  /* there's no /tmp dir on Android */
+#if defined(__ANDROID__) && ! defined(__TERMUX__)  /* there's no /tmp dir on Android */
     len += strlen( config_dir ) + sizeof("/.wineserver");
     if (!(server_dir = malloc( len ))) fatal_error( "out of memory\n" );
     strcpy( server_dir, config_dir );
     strcat( server_dir, "/.wineserver" );
 #else
-    len += sizeof("/tmp/.wine-") + 12;
+    len += sizeof("/data/data/com.termux/files/usr/tmp/.wine-") + 12;
     if (!(server_dir = malloc( len ))) fatal_error( "out of memory\n" );
-    sprintf( server_dir, "/tmp/.wine-%u", getuid() );
+    sprintf( server_dir, "/data/data/com.termux/files/usr/tmp/.wine-%u", getuid() );
 #endif
     create_dir( server_dir, &st2 );
 

@@ -116,6 +116,7 @@ static int open_http_url( const WCHAR *url )
 {
     static const WCHAR defaultbrowsers[] =
         L"xdg-open\0"
+        "/data/data/com.termux/files/usr/bin/open\0"
         "/usr/bin/open\0"
         "firefox\0"
         "konqueror\0"
@@ -141,7 +142,8 @@ static int open_http_url( const WCHAR *url )
 static int open_mailto_url( const WCHAR *url )
 {
     static const WCHAR defaultmailers[] =
-        L"/usr/bin/open\0"
+        L"/data/data/com.termux/files/usr/bin/open"
+        "/usr/bin/open\0"
         "xdg-email\0"
         "mozilla-thunderbird\0"
         "thunderbird\0"

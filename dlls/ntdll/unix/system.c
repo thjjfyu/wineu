@@ -2946,7 +2946,7 @@ NTSTATUS WINAPI NtQuerySystemInformation( SYSTEM_INFORMATION_CLASS class,
             if (!info) ret = STATUS_ACCESS_VIOLATION;
             else
             {
-#ifdef HAVE_GETRANDOM
+#if defined HAVE_GETRANDOM && !defined(__TERMUX__)
                 int ret;
                 do
                 {
