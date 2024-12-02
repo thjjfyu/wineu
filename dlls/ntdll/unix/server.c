@@ -1289,7 +1289,7 @@ static int setup_config_dir(void)
     {
         mkdir( "drive_c", 0777 );
         symlink( "../drive_c", "dosdevices/c:" );
-        symlink( "/", "dosdevices/z:" );
+        symlink( "/data/data/com.winemu/files", "dosdevices/z:" );
     }
     else if (errno != EEXIST) fatal_perror( "cannot create %s/dosdevices", config_dir );
 
