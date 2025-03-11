@@ -50,6 +50,7 @@ WINE_DEFAULT_DEBUG_CHANNEL(dinput);
 #define INPUT_THREAD_NOTIFY     (WM_USER + 0x10)
 #define NOTIFY_THREAD_STOP      0
 #define NOTIFY_REFRESH_DEVICES  1
+#define NOTIFY_FOREGROUND_LOST  2
 
 struct input_thread_state
 {
@@ -174,8 +175,8 @@ static LRESULT CALLBACK cbt_hook_proc( int code, WPARAM wparam, LPARAM lparam )
     if (code == HCBT_ACTIVATE && di_em_win)
     {
         CBTACTIVATESTRUCT *data = (CBTACTIVATESTRUCT *)lparam;
-        handle_foreground_lost( data->hWndActive );
-        SendMessageW( di_em_win, INPUT_THREAD_NOTIFY, NOTIFY_REFRESH_DEVICES, 0 );
+        SendMessageW( di_em_win, INPUT_THREAD_NOTIFY, NOTIFY_FOREGROUND_LOST,
+                      (LPARAM)data->hWndActive );
     }
 
     return CallNextHookEx( 0, code, wparam, lparam );
@@ -319,6 +320,9 @@ static LRESULT WINAPI di_em_win_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPAR
         case NOTIFY_THREAD_STOP:
             state->running = FALSE;
             break;
+        case NOTIFY_FOREGROUND_LOST:
+            handle_foreground_lost( (HWND)lparam );
+            /* fallthrough */
         case NOTIFY_REFRESH_DEVICES:
             while (state->devices_count--) dinput_device_internal_release( state->devices[state->devices_count] );
             input_thread_update_device_list( state );
@@ -358,6 +362,8 @@ static DWORD WINAPI dinput_thread_proc( void *params )
     HANDLE start_event = params;
     DWORD ret;
     MSG msg;
+
+    SetThreadDescription( GetCurrentThread(), L"wine_dinput_worker" );
 
     di_em_win = CreateWindowW( L"DIEmWin", L"DIEmWin", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, DINPUT_instance, NULL );
     input_thread_state = &state;
@@ -482,9 +488,6 @@ void check_dinput_events(void)
     MsgWaitForMultipleObjectsEx(0, NULL, 0, QS_ALLINPUT, 0);
 }
 
-HANDLE steam_overlay_event;
-HANDLE steam_keyboard_event;
-
 BOOL WINAPI DllMain( HINSTANCE inst, DWORD reason, void *reserved )
 {
     TRACE( "inst %p, reason %lu, reserved %p.\n", inst, reason, reserved );
@@ -493,16 +496,12 @@ BOOL WINAPI DllMain( HINSTANCE inst, DWORD reason, void *reserved )
     {
       case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(inst);
-        steam_overlay_event = CreateEventA(NULL, TRUE, FALSE, "__wine_steamclient_GameOverlayActivated");
-        steam_keyboard_event = CreateEventA(NULL, TRUE, FALSE, "__wine_steamclient_KeyboardActivated");
         DINPUT_instance = inst;
         register_di_em_win_class();
         break;
       case DLL_PROCESS_DETACH:
         if (reserved) break;
         unregister_di_em_win_class();
-        CloseHandle(steam_overlay_event);
-        CloseHandle(steam_keyboard_event);
         break;
     }
     return TRUE;
