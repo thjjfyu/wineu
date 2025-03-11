@@ -34,7 +34,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
 #include <X11/Xutil.h>
-#include <X11/XKBlib.h>
+
 
 #include <ctype.h>
 #include <stdarg.h>
@@ -62,6 +62,7 @@ WINE_DECLARE_DEBUG_CHANNEL(key);
 static const unsigned int ControlMask = 1 << 2;
 
 static int min_keycode, max_keycode, keysyms_per_keycode;
+static KeySym *key_mapping;
 static WORD keyc2vkey[256], keyc2scan[256];
 
 static int NumLockMask, ScrollLockMask, AltGrMask; /* mask in the XKeyEvent state */
@@ -1084,6 +1085,11 @@ static const WORD xfree86_vendor_key_vkey[256] =
     0, 0, 0, 0, 0, 0, 0, 0                                      /* 1008FFF8 */
 };
 
+static inline KeySym keycode_to_keysym( Display *display, KeyCode keycode, int index )
+{
+    return key_mapping[(keycode - min_keycode) * keysyms_per_keycode + index];
+}
+
 /* Returns the Windows virtual key code associated with the X event <e> */
 /* kbd_section must be held */
 static WORD EVENT_event_to_vkey( XIC xic, XKeyEvent *e)
@@ -1393,15 +1399,6 @@ BOOL X11DRV_KeyEvent( HWND hwnd, XEvent *xev )
 
     pthread_mutex_lock( &kbd_mutex );
 
-    /* If XKB extensions are used, the state mask for AltGr will use the group
-       index instead of the modifier mask. The group index is set in bits
-       13-14 of the state field in the XKeyEvent structure. So if AltGr is
-       pressed, look if the group index is different than 0. From XKB
-       extension documentation, the group index for AltGr should be 2
-       (event->state = 0x2000). It's probably better to not assume a
-       predefined group index and find it dynamically
-
-       Ref: X Keyboard Extension: Library specification (section 14.1.1 and 17.1.1) */
     /* Save also all possible modifier states. */
     AltGrMask = event->state & (0x6000 | Mod1Mask | Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask);
 
@@ -1498,21 +1495,8 @@ X11DRV_KEYBOARD_DetectLayout( Display *display )
   for (keyc = min_keycode; keyc <= max_keycode; keyc++) {
       /* get data for keycode from X server */
       for (i = 0; i < syms; i++) {
-        if (!(keysym = XkbKeycodeToKeysym( display, keyc, 0, i ))) continue;
+        if (!(keysym = keycode_to_keysym( display, keyc, i ))) continue;
         ckey[keyc][i] = keysym_to_char(keysym);
-        if (TRACE_ON(keyboard))
-        {
-            char buf[32];
-            WCHAR bufW[32];
-            int len, lenW;
-            KeySym orig_keysym = keysym;
-            len = XkbTranslateKeySym(display, &keysym, 0, buf, sizeof(buf), NULL);
-            lenW = ntdll_umbstowcs(buf, len, bufW, ARRAY_SIZE(bufW));
-            if (lenW < ARRAY_SIZE(bufW))
-                bufW[lenW] = 0;
-            TRACE("keycode %u, index %d, orig_keysym 0x%04lx, keysym 0x%04lx, buf %s, bufW %s\n",
-                    keyc, i, orig_keysym, keysym, debugstr_a(buf), debugstr_w(bufW));
-        }
       }
   }
 
@@ -1616,7 +1600,8 @@ void X11DRV_InitKeyboard( Display *display )
 
     pthread_mutex_lock( &kbd_mutex );
     XDisplayKeycodes(display, &min_keycode, &max_keycode);
-    XFree( XGetKeyboardMapping( display, min_keycode, max_keycode + 1 - min_keycode, &keysyms_per_keycode ) );
+    if (key_mapping) XFree( key_mapping );
+    key_mapping = XGetKeyboardMapping( display, min_keycode, max_keycode + 1 - min_keycode, &keysyms_per_keycode );
 
     mmp = XGetModifierMapping(display);
     kcp = mmp->modifiermap;
@@ -1630,12 +1615,12 @@ void X11DRV_InitKeyboard( Display *display )
 		int k;
 
 		for (k = 0; k < keysyms_per_keycode; k += 1)
-                    if (XkbKeycodeToKeysym( display, *kcp, 0, k ) == XK_Num_Lock)
+                    if (keycode_to_keysym( display, *kcp, k ) == XK_Num_Lock)
 		    {
                         NumLockMask = 1 << i;
                         TRACE_(key)("NumLockMask is %x\n", NumLockMask);
 		    }
-                    else if (XkbKeycodeToKeysym( display, *kcp, 0, k ) == XK_Scroll_Lock)
+                    else if (keycode_to_keysym( display, *kcp, k ) == XK_Scroll_Lock)
 		    {
                         ScrollLockMask = 1 << i;
                         TRACE_(key)("ScrollLockMask is %x\n", ScrollLockMask);
@@ -1687,7 +1672,7 @@ void X11DRV_InitKeyboard( Display *display )
 	      /* we seem to need to search the layout-dependent scancodes */
 	      int maxlen=0,maxval=-1,ok;
 	      for (i=0; i<syms; i++) {
-    keysym = XkbKeycodeToKeysym( display, keyc, 0, i );
+    keysym = keycode_to_keysym( display, keyc, i );
                 ckey[i] = keysym_to_char(keysym);
 	      }
 	      /* find key with longest match streak */
@@ -1825,7 +1810,7 @@ void X11DRV_InitKeyboard( Display *display )
     for (scan = 0x60, keyc = min_keycode; keyc <= max_keycode; keyc++)
       if (keyc2vkey[keyc]&&!keyc2scan[keyc]) {
 	const char *ksname;
-	keysym = XkbKeycodeToKeysym( display, keyc, 0, 0 );
+	keysym = keycode_to_keysym( display, keyc, 0 );
 	ksname = XKeysymToString(keysym);
 	if (!ksname) ksname = "NoSymbol";
 
@@ -1944,7 +1929,7 @@ SHORT X11DRV_VkKeyScanEx( WCHAR wChar, HKL hkl )
     }
 
     for (index = 0; index < 4; index++) /* find shift state */
-        if (XkbKeycodeToKeysym( display, keycode, 0, index ) == keysym) break;
+        if (keycode_to_keysym( display, keycode, index ) == keysym) break;
 
     pthread_mutex_unlock( &kbd_mutex );
 
@@ -2194,7 +2179,7 @@ INT X11DRV_GetKeyNameText( LONG lParam, LPWSTR lpBuffer, INT nSize )
       INT rc;
 
       keyc = (KeyCode) keyi;
-      keys = XkbKeycodeToKeysym( display, keyc, 0, 0 );
+      keys = keycode_to_keysym( display, keyc, 0 );
       name = XKeysymToString(keys);
 
       if (name && (vkey == VK_SHIFT || vkey == VK_CONTROL || vkey == VK_MENU))
