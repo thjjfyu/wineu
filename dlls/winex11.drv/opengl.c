@@ -643,6 +643,7 @@ static void *opengl_handle;
 static void init_opengl(void)
 {
     int error_base, event_base;
+    int wine_x11forceglx = 0;
     unsigned int i;
 
     /* No need to load any other libraries as according to the ABI, libGL should be self-sufficient
@@ -790,13 +791,17 @@ static void init_opengl(void)
 
     if(!X11DRV_WineGL_InitOpenglInfo()) goto failed;
 
-    if (XQueryExtension( gdi_display, "GLX", &glx_opcode, &event_base, &error_base ))
+    if (getenv("WINE_X11FORCEGLX"))
+        wine_x11forceglx = atoi("WINE_X11FORCEGLX");
+    
+    if (XQueryExtension( gdi_display, "GLX", &glx_opcode, &event_base, &error_base ) || wine_x11forceglx)
     {
         TRACE("GLX is up and running error_base = %d\n", error_base);
     } else {
         ERR( "GLX extension is missing, disabling OpenGL.\n" );
         goto failed;
     }
+    
     gl_hwnd_context = XUniqueContext();
     gl_pbuffer_context = XUniqueContext();
 
