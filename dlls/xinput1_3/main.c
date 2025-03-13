@@ -54,6 +54,11 @@
 #define REQUEST_CODE_GET_GAMEPAD_STATE 9
 #define REQUEST_CODE_RELEASE_GAMEPAD 10
 
+#define FLAG_DINPUT_MAPPER_STANDARD 0x01
+#define FLAG_DINPUT_MAPPER_XINPUT 0x02
+#define FLAG_INPUT_TYPE_XINPUT 0x04
+#define FLAG_INPUT_TYPE_DINPUT 0x08
+
 #define IDX_BUTTON_A 0
 #define IDX_BUTTON_B 1
 #define IDX_BUTTON_X 2
@@ -66,6 +71,8 @@
 #define IDX_BUTTON_START 7
 #define IDX_BUTTON_L3 8
 #define IDX_BUTTON_R3 9
+
+static char input_type = 0;
 
 WINE_DEFAULT_DEBUG_CHANNEL(xinput);
 
@@ -161,8 +168,6 @@ static void get_gamepad_request(void)
     buffer[0] = REQUEST_CODE_GET_GAMEPAD;
     buffer[1] = 1;
     buffer[2] = 1;
-    *(int*)(buffer + 3) = GetCurrentProcessId();
-
     sendto(server_sock, buffer, BUFFER_SIZE, 0, (struct sockaddr*)&client_addr, sizeof(client_addr));
 }
 
@@ -265,8 +270,10 @@ static void controller_update_state(char *buffer)
         }
     }
     
-    state->Gamepad.bLeftTrigger = (buttons & (1<<10)) ? 255 : 0;
-    state->Gamepad.bRightTrigger = (buttons & (1<<11)) ? 255 : 0;
+    //state->Gamepad.bLeftTrigger = (buttons & (1<<10)) ? 255 : 0;
+    //state->Gamepad.bRightTrigger = (buttons & (1<<11)) ? 255 : 0;
+    state->Gamepad.bLeftTrigger = *(unsigned char*)(buffer + 17);
+    state->Gamepad.bRightTrigger = *(unsigned char*)(buffer + 18);
 
     switch (dpad)
     {
@@ -307,7 +314,7 @@ static DWORD WINAPI controller_read_thread_proc(void *param) {
     last_time = GetCurrentTime();
     while (thread_running)
     {
-        res = recvfrom(server_sock, buffer, BUFFER_SIZE, 0, NULL, NULL);
+        res = recvfrom(server_sock, buffer, BUFFER_SIZE, 0, NULL, 0);
         if (res <= 0)
         {
             if (WSAGetLastError() != WSAEWOULDBLOCK) break;
@@ -326,17 +333,26 @@ static DWORD WINAPI controller_read_thread_proc(void *param) {
         {
             int gamepad_id;
             gamepad_id = *(int*)(buffer + 1);
+            input_type = buffer[5];
             
             EnterCriticalSection(&controller.crit);
-            if (gamepad_id > 0) 
+            if (input_type & FLAG_INPUT_TYPE_XINPUT)
             {
-                controller.id = gamepad_id;
-                if (!controller.connected) controller_init();
+                if (gamepad_id > 0) 
+                {
+                    controller.id = gamepad_id;
+                    if (!controller.connected) controller_init();
+                }
+                else if (gamepad_id == 0) 
+                {
+                    controller.id = 0;
+                    controller.connected = FALSE;       
+                }
             }
-            else if (gamepad_id == 0) 
+            else
             {
                 controller.id = 0;
-                controller.connected = FALSE;       
+                controller.connected = FALSE;  
             }
             LeaveCriticalSection(&controller.crit);
             
