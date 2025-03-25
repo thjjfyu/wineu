@@ -1042,9 +1042,10 @@ static void set_style_hints( struct x11drv_win_data *data, DWORD style, DWORD ex
  *
  * Set the window manager hints that don't change over the lifetime of a window.
  */
-static void set_initial_wm_hints( Display *display, Window window )
+static void set_initial_wm_hints( Display *display, Window window, HWND hwnd )
 {
     long i;
+    DWORD pid = 0;
     Atom protocols[3];
     Atom dndVersion = WINE_XDND_VERSION;
     XClassHint *class_hints;
@@ -1068,10 +1069,11 @@ static void set_initial_wm_hints( Display *display, Window window )
 
     /* set the WM_CLIENT_MACHINE and WM_LOCALE_NAME properties */
     XSetWMProperties(display, window, NULL, NULL, NULL, 0, NULL, NULL, NULL);
-    /* set the pid. together, these properties are needed so the window manager can kill us if we freeze */
-    i = getpid();
+
+    NtUserGetWindowThread( hwnd, &pid );
+    
     XChangeProperty(display, window, x11drv_atom(_NET_WM_PID),
-                    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&i, 1);
+                    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&pid, 1);
 
     XChangeProperty( display, window, x11drv_atom(XdndAware),
                      XA_ATOM, 32, PropModeReplace, (unsigned char*)&dndVersion, 1 );
@@ -2168,7 +2170,7 @@ static void create_whole_window( struct x11drv_win_data *data )
                      PropModeReplace, (unsigned char *)&allow_flip, sizeof(allow_flip) / 4 );
 
     X11DRV_XInput2_Enable( data->display, data->whole_window, attr.event_mask );
-    set_initial_wm_hints( data->display, data->whole_window );
+    set_initial_wm_hints( data->display, data->whole_window, data->hwnd );
     set_wm_hints( data );
 
     XSaveContext( data->display, data->whole_window, winContext, (char *)data->hwnd );
@@ -2398,7 +2400,7 @@ static BOOL create_desktop_win_data( Window win, HWND hwnd )
     data->whole_window = win;
     data->managed = TRUE;
     NtUserSetProp( data->hwnd, whole_window_prop, (HANDLE)win );
-    set_initial_wm_hints( display, win );
+    set_initial_wm_hints( display, win, data->hwnd );
     release_win_data( data );
     if (thread_data->clip_window) XReparentWindow( display, thread_data->clip_window, win, 0, 0 );
     return TRUE;
