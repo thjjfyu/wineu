@@ -806,7 +806,9 @@ static NTSTATUS x11drv_init( void *arg )
 #ifdef SONAME_LIBXCOMPOSITE
     X11DRV_XComposite_Init();
 #endif
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
     x11drv_xinput2_load();
+#endif    
 
     X11DRV_InitKeyboard( gdi_display );
     X11DRV_InitMouse( gdi_display );
@@ -942,7 +944,9 @@ struct x11drv_thread_data *x11drv_init_thread_data(void)
     NtUserGetThreadInfo()->driver_data = (UINT_PTR)data;
 
     if (use_xim) xim_thread_attach( data );
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H    
     x11drv_xinput2_init( data );
+#endif    
 
     return data;
 }

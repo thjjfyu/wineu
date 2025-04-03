@@ -513,10 +513,11 @@ void ungrab_clipping_window(void)
     }
     clipping_cursor = FALSE;
     data->clipping_cursor = FALSE;
-
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
     /* desktop window needs to listen to XInput2 events all the time for rawinput to work */
     if (NtUserGetWindowThread( NtUserGetDesktopWindow(), NULL ) != GetCurrentThreadId())
         X11DRV_XInput2_Enable( data->display, None, 0 );
+#endif        
 }
 
 /***********************************************************************
@@ -1469,10 +1470,10 @@ BOOL X11DRV_SetCursorPos( INT x, INT y )
 
     TRACE( "real setting to %s\n", wine_dbgstr_point( &pos ) );
 
-    pXFixesHideCursor( data->display, root_window );
+    //pXFixesHideCursor( data->display, root_window );
     XWarpPointer( data->display, root_window, root_window, 0, 0, 0, 0, pos.x, pos.y );
     data->warp_serial = NextRequest( data->display );
-    pXFixesShowCursor( data->display, root_window );
+    //pXFixesShowCursor( data->display, root_window );
     XFlush( data->display ); /* avoids bad mouse lag in games that do their own mouse warping */
     TRACE( "warped to (fake) %d,%d serial %lu\n", x, y, data->warp_serial );
     return TRUE;
@@ -1943,8 +1944,6 @@ static BOOL X11DRV_XIDeviceEvent( XIDeviceEvent *event )
     return TRUE;
 }
 
-#endif /* HAVE_X11_EXTENSIONS_XINPUT2_H */
-
 /***********************************************************************
  *              x11drv_xinput2_load
  */
@@ -1993,6 +1992,7 @@ void x11drv_xinput2_load(void)
     TRACE( "X Input 2 support not compiled in.\n" );
 #endif
 }
+
 
 static BOOL X11DRV_RawTouchEvent( XGenericEventCookie *xev )
 {
@@ -2066,6 +2066,7 @@ static BOOL X11DRV_RawTouchEvent( XGenericEventCookie *xev )
     __wine_send_input( 0, &input, &rawinput );
     return TRUE;
 }
+#endif /* HAVE_X11_EXTENSIONS_XINPUT2_H */
 
 /***********************************************************************
  *           X11DRV_GenericEvent

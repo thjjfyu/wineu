@@ -469,7 +469,9 @@ static void sync_window_style( struct x11drv_win_data *data )
         int mask = get_window_attributes( data, &attr );
 
         XChangeWindowAttributes( data->display, data->whole_window, mask, &attr );
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H        
         X11DRV_XInput2_Enable( data->display, data->whole_window, attr.event_mask );
+#endif        
     }
 }
 
@@ -2168,8 +2170,9 @@ static void create_whole_window( struct x11drv_win_data *data )
 
     XChangeProperty( data->display, data->whole_window, x11drv_atom(_WINE_ALLOW_FLIP), XA_CARDINAL, 32,
                      PropModeReplace, (unsigned char *)&allow_flip, sizeof(allow_flip) / 4 );
-
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
     X11DRV_XInput2_Enable( data->display, data->whole_window, attr.event_mask );
+#endif    
     set_initial_wm_hints( data->display, data->whole_window, data->hwnd );
     set_wm_hints( data );
 
@@ -2520,17 +2523,19 @@ BOOL X11DRV_CreateWindow( HWND hwnd )
     {
         struct x11drv_thread_data *data = x11drv_init_thread_data();
         XSetWindowAttributes attr;
-
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
         data->xi2_rawinput_only = TRUE;
         X11DRV_XInput2_Enable( data->display, None, PointerMotionMask | ButtonPressMask | ButtonReleaseMask );
-
+#endif
         /* create the cursor clipping window */
         attr.override_redirect = TRUE;
         attr.event_mask = StructureNotifyMask | FocusChangeMask;
         data->clip_window = XCreateWindow( data->display, root_window, 0, 0, 1, 1, 0, 0,
                                            InputOnly, default_visual.visual,
                                            CWOverrideRedirect | CWEventMask, &attr );
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H                                           
         X11DRV_XInput2_Enable( data->display, data->clip_window, attr.event_mask );
+#endif        
         XSelectInput( data->display, DefaultRootWindow( data->display ), PropertyChangeMask );
         XFlush( data->display );
         NtUserSetProp( hwnd, clip_window_prop, (HANDLE)data->clip_window );
