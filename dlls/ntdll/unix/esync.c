@@ -1337,7 +1337,6 @@ void esync_init(void)
         if (ret != STATUS_NOT_IMPLEMENTED)
         {
             ERR("Server is running with WINEESYNC but this process is not, please enable WINEESYNC or restart wineserver.\n");
-            exit(1);
         }
 
         return;
