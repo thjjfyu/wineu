@@ -1998,15 +1998,6 @@ static void install_bpf(struct sigaction *sig_act)
     unsigned int i, j;
     NTSTATUS status;
 
-    if ((ULONG_PTR)sc_seccomp < NATIVE_SYSCALL_ADDRESS_START
-            || (ULONG_PTR)syscall < NATIVE_SYSCALL_ADDRESS_START)
-    {
-        ERR_(seh)("Native libs are being loaded in low addresses, sc_seccomp %p, syscall %p, not installing seccomp.\n",
-                sc_seccomp, syscall);
-        ERR_(seh)("The known reasons are /proc/sys/vm/legacy_va_layout set to 1 or 'ulimit -s' being 'unlimited'.\n");
-        return;
-    }
-
     sig_act->sa_sigaction = sigsys_handler;
     memset(&prog, 0, sizeof(prog));
 
@@ -2036,9 +2027,9 @@ static void install_bpf(struct sigaction *sig_act)
 
     frame->syscall_flags = syscall_flags;
 
-    test_syscall = mmap((void *)0x600000000000, 0x1000, PROT_EXEC | PROT_READ | PROT_WRITE,
+    test_syscall = mmap(NULL, 0x1000, PROT_EXEC | PROT_READ | PROT_WRITE,
             MAP_PRIVATE | MAP_ANON, -1, 0);
-    if (test_syscall != (void *)0x600000000000)
+    if (test_syscall == MAP_FAILED)
     {
         int ret;
 
