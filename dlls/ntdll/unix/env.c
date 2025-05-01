@@ -822,7 +822,7 @@ static void init_locale(void)
     if (!unix_to_win_locale( all, user_locale )) user_locale[0] = 0;
     TRACE_(nls)( "Unix LC_ALL is %s, user system locale to %s\n", debugstr_a(all), debugstr_a(user_locale) );
 #else
-    if (!unix_to_win_locale ( lc_all, user_locale )) user_locale[0] = 0;     
+    if (!unix_to_win_locale ( all, user_locale )) user_locale[0] = 0;     
     
     if (!(all = setlocale( LC_ALL, "" )) && (all = getenv( "LC_ALL" )))
         FIXME_(nls)( "Failed to set LC_ALL to %s, is the locale supported?\n", debugstr_a(all) );
