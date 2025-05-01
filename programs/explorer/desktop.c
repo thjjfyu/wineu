@@ -1085,6 +1085,7 @@ static void start_xalia_process(void)
 void manage_desktop( WCHAR *arg )
 {
     HDESK desktop = 0;
+    static int no_duplicate_explorer = -1;
     GUID guid;
     MSG msg;
     HWND hwnd;
@@ -1147,8 +1148,11 @@ void manage_desktop( WCHAR *arg )
         }
         SetThreadDesktop( desktop );
     }
-    else ExitProcess( 0 );
-
+    else {
+        no_duplicate_explorer = getenv("WINE_NO_DUPLICATE_EXPLORER") && atoi(getenv("WINE_NO_DUPLICATE_EXPLORER"));
+        if (no_duplicate_explorer == 1)
+            ExitProcess( 0 );
+    }
     /* create the desktop window */
     hwnd = CreateWindowExW( 0, DESKTOP_CLASS_ATOM, NULL,
                             WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0, 0, 0, 0, 0, 0, 0, &guid );
