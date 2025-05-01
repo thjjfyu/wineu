@@ -59,7 +59,7 @@
 
 WINE_DEFAULT_DEBUG_CHANNEL(dnsapi);
 
-#ifdef HAVE_RESOLVE
+#if !defined(__ANDROID__)
 
 /* call res_init() just once because of a bug in Mac OS X 10.4 */
 /* call once per thread on systems that have per-thread _res */
