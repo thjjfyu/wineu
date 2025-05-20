@@ -1972,9 +1972,13 @@ static void x11drv_surface_flush( struct window_surface *window_surface )
 #ifdef HAVE_LIBXXSHM
         if (surface->shminfo.shmid != -1)
         {
+#ifdef SONAME_LIBXRENDER        
             if (!fshack || !fs_hack_put_image_scaled( surface->hwnd, surface->window, surface->gc, surface->image,
                                                       surface->header.rect.left, surface->header.rect.top,
                                                       coords.width, coords.height, surface->is_argb ))
+#else
+            if (!fshack)
+#endif            
                 XShmPutImage( gdi_display, surface->window, surface->gc, surface->image,
                               coords.visrect.left, coords.visrect.top,
                               surface->header.rect.left + coords.visrect.left,
