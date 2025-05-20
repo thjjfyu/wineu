@@ -277,7 +277,7 @@ static char *get_nls_dir(void)
 /* load the case mapping table */
 struct fd *load_intl_file(void)
 {
-    static const char *nls_dirs[] = { NULL, NLSDIR, "/wine/nls", "/usr/local/share/wine/nls", "/usr/share/wine/nls", "/data/data/com.winlator/files/imagefs/usr/share" };
+    static const char *nls_dirs[] = { NULL, NLSDIR, "/wine/nls", "/usr/local/share/wine/nls", "/usr/share/wine/nls" };
     static const WCHAR nt_pathW[] = {'C',':','\\','w','i','n','d','o','w','s','\\',
         's','y','s','t','e','m','3','2','\\','l','_','i','n','t','l','.','n','l','s',0};
     static const struct unicode_str nt_name = { nt_pathW, sizeof(nt_pathW) };
@@ -300,6 +300,15 @@ struct fd *load_intl_file(void)
                            FILE_NON_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_NONALERT ))) break;
         free( path );
     }
+    if (!fd && getenv("XDG_DATA_DIRS")) {
+    	char *share_dir = getenv("XDG_DATA_DIRS");
+    	char *path = malloc(strlen(share_dir) + strlen("/l_intl.nls") + 1);
+    	sprintf(path, "%s/%s", share_dir, "wine/nls/l_intl.nls");
+    	fd = open_fd( NULL, path, nt_name, O_RDONLY, &mode, FILE_READ_DATA,
+    	              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+    	              FILE_NON_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_NONALERT );
+    	free ( path );              
+    } 
     if (!fd) fatal_error( "failed to load l_intl.nls\n" );
     unix_fd = get_unix_fd( fd );
     /* read initial offset */

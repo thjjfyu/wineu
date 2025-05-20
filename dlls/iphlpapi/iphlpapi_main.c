@@ -44,7 +44,7 @@
 WINE_DEFAULT_DEBUG_CHANNEL(iphlpapi);
 
 #define CHARS_IN_GUID 39
-#define ADAPTER_INFO_PATH "/data/data/com.winlator/files/imagefs/usr/tmp/adapterinfo"
+#define ADAPTER_INFO_PATH "/data/data/com.winlator.cmod/files/imagefs/usr/tmp/adapterinfo"
 #define ADAPTER_INFO_UUID "{f40158d8-f074-47e4-a039-cff6a16846e0}"
 
 static const WCHAR *device_tcpip = L"\\DEVICE\\TCPIP_";
@@ -245,8 +245,19 @@ static struct adapter_info* read_adapters_info_from_file( int *adapter_info_size
         *adapter_info_size = cached_adapter_info_size;
         return cached_adapters_info;
     }
+
+    char *adapter_info_path;
+
+    char *tmpdir = getenv("TMPDIR");
+
+    if (tmpdir) {
+        adapter_info_path = malloc(strlen(tmpdir) + strlen("adapterinfo") + 2);
+    	sprintf(adapter_info_path, "%s/%s", tmpdir, "adapterinfo");
+    } else {
+    	adapter_info_path = ADAPTER_INFO_PATH;
+    }
     
-    file = fopen( ADAPTER_INFO_PATH, "r" );
+    file = fopen( adapter_info_path, "r" );
     if (file != NULL) 
     {
         int col, index, list_size = 0;

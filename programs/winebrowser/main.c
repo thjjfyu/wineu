@@ -133,7 +133,6 @@ static int open_http_url( const WCHAR *url )
     static const WCHAR defaultbrowsers[] =
         L"xdg-open\0"
         "/usr/bin/open\0"
-        "/data/data/com.winlator/files/imagefs/usr/bin/open\0"
         "firefox\0"
         "konqueror\0"
         "mozilla\0"
@@ -149,8 +148,15 @@ static int open_http_url( const WCHAR *url )
         r = get_commands( key, L"Browsers", browsers, sizeof(browsers) );
         RegCloseKey( key );
     }
-    if (r != ERROR_SUCCESS)
+    if (r != ERROR_SUCCESS) {
         memcpy( browsers, defaultbrowsers, sizeof(defaultbrowsers) );
+        char *prefix = getenv("PREFIX");
+        if (prefix) {
+            char *open_bin = malloc(strlen(prefix) + strlen("/bin/open") + 1);
+            sprintf(open_bin, "%s/%s", prefix, "bin/open");
+            strcat( browsers, open_bin );
+        }
+    }    
 
     return launch_app( browsers, url );
 }
@@ -159,7 +165,6 @@ static int open_mailto_url( const WCHAR *url )
 {
     static const WCHAR defaultmailers[] =
         L"/usr/bin/open\0"
-        "/data/data/com.winlator/files/imagefs/usr/bin/open\0"
         "xdg-email\0"
         "mozilla-thunderbird\0"
         "thunderbird\0"
@@ -174,9 +179,16 @@ static int open_mailto_url( const WCHAR *url )
         r = get_commands( key, L"Mailers", mailers, sizeof(mailers) );
         RegCloseKey( key );
     }
-    if (r != ERROR_SUCCESS)
+    if (r != ERROR_SUCCESS) {
         memcpy( mailers, defaultmailers, sizeof(defaultmailers) );
-
+        char *prefix = getenv("PREFIX");
+        if (prefix) {
+            char *open_bin = malloc(strlen(prefix) + strlen("/bin/open") + 1);
+            sprintf(open_bin, "%s/%s", prefix, "bin/open");
+        	strcat( mailers, open_bin);
+        }  	
+    }
+    
     return launch_app( mailers, url );
 }
 
