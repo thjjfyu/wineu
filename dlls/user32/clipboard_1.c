@@ -709,33 +709,16 @@ HANDLE WINAPI SetClipboardData( UINT format, HANDLE data )
 
     status = NtUserSetClipboardData( format, data, &params );
 
-    EnterCriticalSection( &clipboard_cs );
-    
-    if (wine_to_android_clipboard) {
+    if (wine_to_android_clipboard && params.data) {
     	android_clipboard_data_t clipboard_data;
-    	HANDLE hData;
-    	struct get_clipboard_params get_params;
         ZeroMemory(&clipboard_data, sizeof(clipboard_data));
         clipboard_data.request_code = 2;
-        clipboard_data.format = CF_UNICODETEXT;
-        if (format != CF_UNICODETEXT) {
-        	get_params.size = 1024;
-            get_params.data_size = 0;
-            get_params.data = GlobalAlloc( GMEM_FIXED, get_params.size );
-            hData = NtUserGetClipboardData(clipboard_data.format, &get_params);
-            clipboard_data.size = get_params.size;
-            clipboard_data.data = GlobalLock(hData);
-        } else {
-            clipboard_data.size = params.size;
-        	clipboard_data.data = params.data;	
-        }
+        clipboard_data.format = format;
+        clipboard_data.size = params.size;
+        clipboard_data.data = params.data;
         if (!send_android_clipboard_data(clipboard_data))
         	TRACE( "Failed to send Windows clipboard data\n" );
-        if (hData) GlobalUnlock(hData);
-        if (get_params.data) GlobalFree(get_params.data);
     }
-
-    LeaveCriticalSection( &clipboard_cs );
 
     if (params.data) GlobalUnlock( handle );
     if (handle != data) GlobalFree( handle );
@@ -774,15 +757,15 @@ HANDLE WINAPI GetClipboardData( UINT format )
         struct set_clipboard_params set_params;
     	android_clipboard_data_t clipboard_data = receive_android_clipboard_data();
     	if (clipboard_data.data) {
-        	ret = GlobalAlloc( GMEM_MOVEABLE, clipboard_data.size );
-        	void *dst = GlobalLock(ret);
+        	HANDLE hglobal = GlobalAlloc( GMEM_MOVEABLE, clipboard_data.size );
+        	void *dst = GlobalLock(hglobal);
         	memcpy(dst, clipboard_data.data, clipboard_data.size);
-        	GlobalUnlock(ret);
+        	GlobalUnlock(hglobal);
     		set_params.data = clipboard_data.data;
     		set_params.size = clipboard_data.size;
     		set_params.cache_only = FALSE;
     		NtUserEmptyClipboard();
-    		NtUserSetClipboardData( clipboard_data.format, ret, &set_params );
+    		NtUserSetClipboardData( clipboard_data.format, hglobal, &set_params );
     	}
     	else
     		TRACE( "Failed to receive Android clipboard data\n" );
