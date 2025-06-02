@@ -398,6 +398,7 @@ static void kernel_writewatch_softdirty_init(void)
 
 static void kernel_writewatch_init(void)
 {
+#ifndef __ANDROID__
     struct uffdio_api uffdio_api;
 
     uffd_fd = syscall( __NR_userfaultfd, O_CLOEXEC | O_NONBLOCK | UFFD_USER_MODE_ONLY );
@@ -423,6 +424,10 @@ static void kernel_writewatch_init(void)
         return;
     }
     use_kernel_writewatch = 1;
+#else
+	TRACE( "Kernel writewatches are not supported on Android\n" );
+    use_kernel_writewatch = 0;
+#endif    	    
 }
 
 static void kernel_writewatch_reset( void *start, SIZE_T len )
