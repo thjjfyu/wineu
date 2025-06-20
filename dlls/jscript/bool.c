@@ -149,16 +149,16 @@ static HRESULT BoolConstr_value(script_ctx_t *ctx, jsval_t vthis, WORD flags, un
 
     switch(flags) {
     case DISPATCH_CONSTRUCT: {
-        jsdisp_t *bool;
+        jsdisp_t *boolean;
 
         if(!r)
             return S_OK;
 
-        hres = create_bool(ctx, value, &bool);
+        hres = create_bool(ctx, value, &boolean);
         if(FAILED(hres))
             return hres;
 
-        *r = jsval_obj(bool);
+        *r = jsval_obj(boolean);
         return S_OK;
     }
 
@@ -177,54 +177,54 @@ static HRESULT BoolConstr_value(script_ctx_t *ctx, jsval_t vthis, WORD flags, un
 
 static HRESULT alloc_bool(script_ctx_t *ctx, jsdisp_t *object_prototype, BoolInstance **ret)
 {
-    BoolInstance *bool;
+    BoolInstance *boolean;
     HRESULT hres;
 
-    bool = calloc(1, sizeof(BoolInstance));
-    if(!bool)
+    boolean = calloc(1, sizeof(BoolInstance));
+    if(!boolean)
         return E_OUTOFMEMORY;
 
     if(object_prototype)
-        hres = init_dispex(&bool->dispex, ctx, &Bool_info, object_prototype);
+        hres = init_dispex(&boolean->dispex, ctx, &Bool_info, object_prototype);
     else
-        hres = init_dispex_from_constr(&bool->dispex, ctx, &BoolInst_info, ctx->bool_constr);
+        hres = init_dispex_from_constr(&boolean->dispex, ctx, &BoolInst_info, ctx->bool_constr);
 
     if(FAILED(hres)) {
-        free(bool);
+        free(boolean);
         return hres;
     }
 
-    *ret = bool;
+    *ret = boolean;
     return S_OK;
 }
 
 HRESULT create_bool_constr(script_ctx_t *ctx, jsdisp_t *object_prototype, jsdisp_t **ret)
 {
-    BoolInstance *bool;
+    BoolInstance *boolean;
     HRESULT hres;
 
-    hres = alloc_bool(ctx, object_prototype, &bool);
+    hres = alloc_bool(ctx, object_prototype, &boolean);
     if(FAILED(hres))
         return hres;
 
     hres = create_builtin_constructor(ctx, BoolConstr_value, L"Boolean", NULL,
-            PROPF_CONSTR|1, &bool->dispex, ret);
+            PROPF_CONSTR|1, &boolean->dispex, ret);
 
-    jsdisp_release(&bool->dispex);
+    jsdisp_release(&boolean->dispex);
     return hres;
 }
 
 HRESULT create_bool(script_ctx_t *ctx, BOOL b, jsdisp_t **ret)
 {
-    BoolInstance *bool;
+    BoolInstance *boolean;
     HRESULT hres;
 
-    hres = alloc_bool(ctx, NULL, &bool);
+    hres = alloc_bool(ctx, NULL, &boolean);
     if(FAILED(hres))
         return hres;
 
-    bool->val = b;
+    boolean->val = b;
 
-    *ret = &bool->dispex;
+    *ret = &boolean->dispex;
     return S_OK;
 }
