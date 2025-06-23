@@ -60,7 +60,7 @@ BOOL WINAPI GetUserNameA( LPSTR name, LPDWORD size )
 BOOL WINAPI GetUserNameW( LPWSTR name, LPDWORD size )
 {
  	
- 	DWORD len = GetEnvironmentVariableW( "WINEUSERNAME", name, *size );
+ 	DWORD len = GetEnvironmentVariableW( L"WINEUSERNAME", name, *size );
  	BOOL ret;
  	    
  	if (!len) return FALSE;
