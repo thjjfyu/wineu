@@ -1,4 +1,4 @@
-/*
+ /*
  * X11 mouse driver
  *
  * Copyright 1998 Ulrich Weigand
@@ -513,10 +513,11 @@ void ungrab_clipping_window(void)
     }
     clipping_cursor = FALSE;
     data->clipping_cursor = FALSE;
-
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H    
     /* desktop window needs to listen to XInput2 events all the time for rawinput to work */
     if (NtUserGetWindowThread( NtUserGetDesktopWindow(), NULL ) != GetCurrentThreadId())
         X11DRV_XInput2_Enable( data->display, None, 0 );
+#endif        
 }
 
 /***********************************************************************
@@ -1468,11 +1469,14 @@ BOOL X11DRV_SetCursorPos( INT x, INT y )
     }
 
     TRACE( "real setting to %s\n", wine_dbgstr_point( &pos ) );
-
+#ifdef SONAME_LIBXFIXES
     pXFixesHideCursor( data->display, root_window );
+#endif    
     XWarpPointer( data->display, root_window, root_window, 0, 0, 0, 0, pos.x, pos.y );
     data->warp_serial = NextRequest( data->display );
+#ifdef SONAME_LIBXFIXES
     pXFixesShowCursor( data->display, root_window );
+#endif
     XFlush( data->display ); /* avoids bad mouse lag in games that do their own mouse warping */
     TRACE( "warped to (fake) %d,%d serial %lu\n", x, y, data->warp_serial );
     return TRUE;
@@ -1994,6 +1998,8 @@ void x11drv_xinput2_load(void)
 #endif
 }
 
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
+
 static BOOL skip_mouse_from_touch(void)
 {
     static int cached = -1;
@@ -2077,6 +2083,8 @@ static BOOL X11DRV_RawTouchEvent( XGenericEventCookie *xev )
     __wine_send_input( 0, &input, &rawinput );
     return TRUE;
 }
+
+#endif
 
 /***********************************************************************
  *           X11DRV_GenericEvent
