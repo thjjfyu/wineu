@@ -1098,6 +1098,7 @@ void manage_desktop( WCHAR *arg )
     HMODULE shell32;
     HANDLE thread;
     DWORD id;
+    static int wine_no_duplicate_explorer = -1;
 
     /* get the rest of the command line (if any) */
     while (*p && !is_whitespace(*p)) p++;
@@ -1134,6 +1135,9 @@ void manage_desktop( WCHAR *arg )
     TRACE( "display guid %s\n", debugstr_guid(&guid) );
     load_graphics_driver( driver, &guid );
 
+    if (wine_no_duplicate_explorer == -1)
+    	wine_no_duplicate_explorer = getenv("WINE_NO_DUPLICATE_EXPLORER") && atoi(getenv("WINE_NO_DUPLICATE_EXPLORER"));
+
     if (name && width && height)
     {
         DEVMODEW devmode = {.dmPelsWidth = width, .dmPelsHeight = height};
@@ -1146,6 +1150,8 @@ void manage_desktop( WCHAR *arg )
             ExitProcess( 1 );
         }
         SetThreadDesktop( desktop );
+    } else {
+    	if (wine_no_duplicate_explorer) ExitProcess( 0 );
     }
 
     /* create the desktop window */
