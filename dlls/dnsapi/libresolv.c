@@ -59,7 +59,67 @@
 
 WINE_DEFAULT_DEBUG_CHANNEL(dnsapi);
 
-#ifndef __ANDROID__
+#ifdef __ANDROID__
+
+#include <dlfcn.h>
+enum ResNsendFlags : uint32_t {
+	ANDROID_RESOLV_NO_RETRY = 1 << 0,
+    ANDROID_RESOLV_NO_CACHE_STORE = 1 << 1,
+    ANDROID_RESOLV_NO_CACHE_LOOKUP = 1 << 2,
+};
+ 
+typedef uint64_t net_handle_t;
+ 
+#define NETWORK_UNSPECIFIED ((net_handle_t)0)
+
+static void *libandroid_handle;
+static int (*p_android_res_nquery)(net_handle_t network, const char *dname, int ns_class, int ns_type, uint32_t flags);
+static int (*p_android_res_nresult)(int fd, int *rcode, uint8_t *answer, size_t anslen);
+
+static void init_resolver( void ) {
+	if (!libandroid_handle)
+		libandroid_handle = dlopen("libandroid.so", RTLD_LOCAL | RTLD_NOW);
+    if (!p_android_res_nquery)
+    	p_android_res_nquery = dlsym(libandroid_handle, "android_res_nquery");
+    if (!p_android_res_nresult)
+    	p_android_res_nresult = dlsym(libandroid_handle, "android_res_nresult");
+}
+
+static DNS_STATUS map_h_errno( int error )
+{
+    switch (error) {
+    	case ns_r_formerr:
+        	return DNS_ERROR_RCODE_FORMAT_ERROR;
+        case ns_r_servfail:
+            return DNS_ERROR_RCODE_SERVER_FAILURE;
+        case ns_r_nxdomain:
+            return DNS_ERROR_RCODE_NAME_ERROR;
+        case ns_r_notimpl:
+            return DNS_ERROR_RCODE_NOT_IMPLEMENTED;
+        case ns_r_refused:
+            return DNS_ERROR_RCODE_REFUSED;
+        case ns_r_yxdomain:
+            return DNS_ERROR_RCODE_YXDOMAIN;
+        case ns_r_yxrrset:
+            return DNS_ERROR_RCODE_YXRRSET;
+        case ns_r_nxrrset:
+            return DNS_ERROR_RCODE_NXRRSET;
+        case ns_r_notauth:
+            return DNS_ERROR_RCODE_NOTAUTH;
+        case ns_r_notzone:
+            return DNS_ERROR_RCODE_NOTZONE;
+        case ns_r_badsig:
+            return DNS_ERROR_RCODE_BADSIG;
+        case ns_r_badkey:
+            return DNS_ERROR_RCODE_BADKEY;
+        case ns_r_badtime:
+            return DNS_ERROR_RCODE_BADTIME;
+        default:
+            return DNS_ERROR_RCODE_NOT_IMPLEMENTED;
+    }
+}
+        
+#else
 
 /* call res_init() just once because of a bug in Mac OS X 10.4 */
 /* call once per thread on systems that have per-thread _res */
@@ -67,6 +127,8 @@ static void init_resolver( void )
 {
     if (!(_res.options & RES_INIT)) res_init();
 }
+
+
 
 static unsigned long map_options( DWORD options )
 {
@@ -124,6 +186,29 @@ static DNS_STATUS map_h_errno( int error )
     }
 }
 
+#endif
+
+#ifdef __ANDROID__
+
+static NTSTATUS resolv_get_searchlist( void *args )
+{
+	const struct get_searchlist_params *params = args;
+    WCHAR *list = params->list;
+ 
+    if (!list || *params->len < sizeof(WCHAR))
+    {
+    	*params->len = sizeof(WCHAR);
+        return !list ? ERROR_SUCCESS : ERROR_MORE_DATA;
+    }
+ 
+    *list = 0;
+    *params->len = sizeof(WCHAR);
+ 
+    return ERROR_SUCCESS;
+}
+
+#else
+
 static NTSTATUS resolv_get_searchlist( void *args )
 {
     const struct get_searchlist_params *params = args;
@@ -153,6 +238,7 @@ static NTSTATUS resolv_get_searchlist( void *args )
     return ERROR_SUCCESS;
 }
 
+#endif
 
 static inline int filter( unsigned short sin_family, USHORT family )
 {
@@ -240,6 +326,7 @@ static NTSTATUS resolv_get_serverlist( void *args )
 
 static NTSTATUS resolv_get_serverlist( void *args )
 {
+#ifndef __ANDROID__
     const struct get_serverlist_params *params = args;
     DNS_ADDR_ARRAY *addrs = params->addrs;
     DWORD needed, found, i;
@@ -302,11 +389,16 @@ static NTSTATUS resolv_get_serverlist( void *args )
     }
 
     return ERROR_SUCCESS;
+#else
+    TRACE( "resolv_get_serverlist not supported on Android\n" );
+    return DNS_ERROR_NO_DNS_SERVERS;
+#endif
 }
 #endif
 
 static NTSTATUS resolv_set_serverlist( void *args )
 {
+#ifndef __ANDROID__
     const IP4_ARRAY *addrs = args;
     int i;
 
@@ -323,8 +415,10 @@ static NTSTATUS resolv_set_serverlist( void *args )
 
     for (i = 0; i < _res.nscount; i++)
         _res.nsaddr_list[i].sin_addr.s_addr = addrs->AddrArray[i];
-
-    return ERROR_SUCCESS;
+#else
+	TRACE( "resolv_set_serverlist not supported on Android\n" );
+#endif
+	return ERROR_SUCCESS;
 }
 
 static NTSTATUS resolv_query( void *args )
@@ -332,166 +426,33 @@ static NTSTATUS resolv_query( void *args )
     const struct query_params *params = args;
     DNS_STATUS ret = ERROR_SUCCESS;
     int len;
-
+#ifdef __ANDROID__    
+    uint32_t flags = 0;
+	int fd = 0;
+	int rcode = 0;
+#endif
     init_resolver();
+#ifndef __ANDROID__
     _res.options |= map_options( params->options );
-
     if ((len = res_query( params->name, ns_c_in, params->type, params->buf, *params->len )) < 0)
-        ret = map_h_errno( h_errno );
+    	ret = map_h_errno( h_errno );
     else
         *params->len = len;
+#else
+	if (params->options & DNS_QUERY_BYPASS_CACHE)
+		flags = ANDROID_RESOLV_NO_CACHE_STORE | ANDROID_RESOLV_NO_CACHE_LOOKUP;
+
+ 	if ((fd = p_android_res_nquery( NETWORK_UNSPECIFIED, params->name, ns_c_in, params->type, flags)) < 0) 
+    	return DNS_ERROR_RCODE_REFUSED;
+   
+    if ((len = p_android_res_nresult(fd, &rcode, params->buf, *params->len)) < 0) 
+    	ret = map_h_errno( rcode );
+	else
+	    *params->len = len;
+#endif	    
     return ret;
 }
-
-#endif
-
-#ifdef __ANDROID__
-
-#include <dlfcn.h>
  
- enum ResNsendFlags : uint32_t {
-     ANDROID_RESOLV_NO_RETRY = 1 << 0,
-     ANDROID_RESOLV_NO_CACHE_STORE = 1 << 1,
-     ANDROID_RESOLV_NO_CACHE_LOOKUP = 1 << 2,
- };
- 
- typedef uint64_t net_handle_t;
- 
- #define NETWORK_UNSPECIFIED ((net_handle_t)0)
- 
- static int (*p_android_res_nsend)(net_handle_t network, const uint8_t *msg, size_t msglen,
-                       uint32_t flags);
- 
- static int (*p_android_res_nresult)(int fd, int *rcode, uint8_t *answer, size_t anslen);
- 
- static BOOL android_resolv_init( void )
- {
-     static BOOL init_done = FALSE;
-     if (!init_done)
-     {
-         void *android_handle = dlopen( "libandroid.so", RTLD_NOW );
-         if (!android_handle) {
-             TRACE( "failed to load libandroid.so: %s\n", dlerror() );
-             init_done = TRUE;
-             return FALSE;
-         }
- 
- #define LOAD_FUNCPTR(f) p_##f = dlsym(android_handle, #f)
-         LOAD_FUNCPTR(android_res_nsend);
-         LOAD_FUNCPTR(android_res_nresult);
- #undef LOAD_FUNCPTR
-         init_done = TRUE;
-     }
- 
-     return p_android_res_nsend && p_android_res_nresult;
- }
- 
- static NTSTATUS resolv_get_searchlist( void *args )
- {
-     /* Android NDK networking doesn't have DNS suffixes/searchlists */
-     const struct get_searchlist_params *params = args;
-     WCHAR *list = params->list;
- 
-     if (!list || *params->len < sizeof(WCHAR))
-     {
-         *params->len = sizeof(WCHAR);
-         return !list ? ERROR_SUCCESS : ERROR_MORE_DATA;
-     }
- 
-     *list = 0; /* null terminator */
-     *params->len = sizeof(WCHAR);
- 
-     return ERROR_SUCCESS;
- }
- 
- static NTSTATUS resolv_get_serverlist( void *args )
- {
-     /* Android NDK networking doesn't support retrieving the nameservers */ 
-     TRACE( "resolv_get_serverlist not supported on Android\n" );
-     return DNS_ERROR_NO_DNS_SERVERS;
- }
- 
- static NTSTATUS resolv_set_serverlist( void *args )
- {
-     /* Android NDK networking doesn't support changing the nameservers */ 
-     TRACE( "resolv_set_serverlist not supported on Android\n" );
-     return ERROR_SUCCESS;
- }
- 
- static NTSTATUS resolv_query( void *args )
- {
-     const struct query_params *params = args;
-     uint8_t msg[NS_PACKETSZ];
-     int msglen, res, rcode = 0;
-     HEADER *header;
-     uint32_t flags = 0;
- 
-     if (!android_resolv_init())
-         return DNS_ERROR_RCODE_NOT_IMPLEMENTED; /* The host libandroid doesn't
-                                                    seem to implement the NDK
-                                                    networking functions */
- 
-     msglen = res_mkquery( ns_o_query, params->name, ns_c_in, params->type,
-                           NULL, 0, NULL, msg, NS_PACKETSZ );
- 
-     header = (HEADER *)msg;
-     header->rd = !(params->options & DNS_QUERY_NO_RECURSION);
-     header->ad = (params->options & DNS_QUERY_DNSSEC_OK);
- 
-     if (params->options & DNS_QUERY_BYPASS_CACHE)
-         flags = ANDROID_RESOLV_NO_CACHE_STORE | ANDROID_RESOLV_NO_CACHE_LOOKUP;
- 
-     if ((res = (*p_android_res_nsend)( NETWORK_UNSPECIFIED, msg, msglen, flags )) < 0)
-         return DNS_ERROR_RCODE_REFUSED; /* The query failed, the results provided
-                                            by this don't properly translate to
-                                            WinAPI ones */
- 
-     if ((res = (*p_android_res_nresult)( res, &rcode, params->buf,
-                                         *params->len )) < 0)
-         return DNS_ERROR_RCODE_REFUSED;
- 
-     if (rcode == ns_r_noerror)
-     {
-         *params->len = res;
-         return ERROR_SUCCESS;
-     }
-     else
-     {
-         switch (rcode) {
-             case ns_r_formerr:
-                 return DNS_ERROR_RCODE_FORMAT_ERROR;
-             case ns_r_servfail:
-                 return DNS_ERROR_RCODE_SERVER_FAILURE;
-             case ns_r_nxdomain:
-                 return DNS_ERROR_RCODE_NAME_ERROR;
-             case ns_r_notimpl:
-                 return DNS_ERROR_RCODE_NOT_IMPLEMENTED;
-             case ns_r_refused:
-                 return DNS_ERROR_RCODE_REFUSED;
-             case ns_r_yxdomain:
-                 return DNS_ERROR_RCODE_YXDOMAIN;
-             case ns_r_yxrrset:
-                 return DNS_ERROR_RCODE_YXRRSET;
-             case ns_r_nxrrset:
-                 return DNS_ERROR_RCODE_NXRRSET;
-             case ns_r_notauth:
-                 return DNS_ERROR_RCODE_NOTAUTH;
-             case ns_r_notzone:
-                 return DNS_ERROR_RCODE_NOTZONE;
-             case ns_r_badsig:
-                 return DNS_ERROR_RCODE_BADSIG;
-             case ns_r_badkey:
-                 return DNS_ERROR_RCODE_BADKEY;
-             case ns_r_badtime:
-                 return DNS_ERROR_RCODE_BADTIME;
-             default:
-                 return DNS_ERROR_RCODE_NOT_IMPLEMENTED;
-         }
-     }
- }
- 
- #endif
-
 const unixlib_entry_t __wine_unix_call_funcs[] =
 {
     resolv_get_searchlist,
