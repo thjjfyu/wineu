@@ -1460,49 +1460,6 @@ static INT freetype_add_mem_font( void *ptr, SIZE_T size, UINT flags )
     return AddFontToList( NULL, NULL, ptr, size, flags );
 }
 
-#ifdef __ANDROID__
-static BOOL ReadFontDir(const char *dirname, BOOL external_fonts)
-{
-    DIR *dir;
-    struct dirent *dent;
-    char path[MAX_PATH];
-
-    TRACE("Loading fonts from %s\n", debugstr_a(dirname));
-
-    dir = opendir(dirname);
-    if(!dir) {
-        WARN("Can't open directory %s\n", debugstr_a(dirname));
-	return FALSE;
-    }
-    while((dent = readdir(dir)) != NULL) {
-	struct stat statbuf;
-
-        if(!strcmp(dent->d_name, ".") || !strcmp(dent->d_name, ".."))
-	    continue;
-
-	TRACE("Found %s in %s\n", debugstr_a(dent->d_name), debugstr_a(dirname));
-
-	sprintf(path, "%s/%s", dirname, dent->d_name);
-
-	if(stat(path, &statbuf) == -1)
-	{
-	    WARN("Can't stat %s\n", debugstr_a(path));
-	    continue;
-	}
-	if(S_ISDIR(statbuf.st_mode))
-	    ReadFontDir(path, external_fonts);
-	else
-        {
-            DWORD addfont_flags = 0;
-            if(external_fonts) addfont_flags |= ADDFONT_EXTERNAL_FONT;
-            AddFontToList(NULL, path, NULL, 0, addfont_flags);
-        }
-    }
-    closedir(dir);
-    return TRUE;
-}
-#endif
-
 #ifdef SONAME_LIBFONTCONFIG
 
 static BOOL fontconfig_enabled;
@@ -1915,8 +1872,6 @@ static void freetype_load_fonts(void)
     load_fontconfig_fonts();
 #elif defined(__APPLE__)
     load_mac_fonts();
-#elif defined(__ANDROID__)
-    ReadFontDir("/system/fonts", TRUE);
 #endif
 }
 
