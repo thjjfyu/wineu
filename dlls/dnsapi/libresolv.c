@@ -44,6 +44,8 @@
 # include <netdb.h>
 #endif
 
+#include <arpa/inet.h> 
+
 #include "ntstatus.h"
 #define WIN32_NO_STATUS
 #include "windef.h"
@@ -53,7 +55,6 @@
 #define USE_WS_PREFIX
 #include "ws2def.h"
 #include "ws2ipdef.h"
-
 #include "wine/debug.h"
 #include "dnsapi.h"
 
@@ -326,11 +327,10 @@ static NTSTATUS resolv_get_serverlist( void *args )
 
 static NTSTATUS resolv_get_serverlist( void *args )
 {
-#ifndef __ANDROID__
-    const struct get_serverlist_params *params = args;
+	const struct get_serverlist_params *params = args;
     DNS_ADDR_ARRAY *addrs = params->addrs;
     DWORD needed, found, i;
-
+#ifndef __ANDROID__
     init_resolver();
 
     if (!_res.nscount) return DNS_ERROR_NO_DNS_SERVERS;
@@ -390,8 +390,21 @@ static NTSTATUS resolv_get_serverlist( void *args )
 
     return ERROR_SUCCESS;
 #else
-    TRACE( "resolv_get_serverlist not supported on Android\n" );
-    return DNS_ERROR_NO_DNS_SERVERS;
+	char *dns = getenv("ANDROID_RESOLV_DNS") ? getenv("ANDROID_RESOLV_DNS") : "8.8.4.4";
+    TRACE( "resolv_get_serverlist not supported on Android, attempting to hardcode\n" );
+    memset(addrs, 0, sizeof(DNS_ADDR_ARRAY));
+
+    found = 0;
+
+    addrs->MaxCount = addrs->AddrCount = 1;
+
+    SOCKADDR_IN *sa = (SOCKADDR_IN *)addrs->AddrArray[0].MaxSa;
+    sa->sin_family = WS_AF_INET;
+    inet_pton(WS_AF_INET, dns, &sa->sin_addr);
+    addrs->AddrArray[0].Data.DnsAddrUserDword[0] = sizeof(*sa);
+    found++;
+    *params->len = FIELD_OFFSET(DNS_ADDR_ARRAY, AddrArray[found]);
+    return ERROR_SUCCESS;
 #endif
 }
 #endif
