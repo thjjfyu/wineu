@@ -62,6 +62,8 @@ WINE_DEFAULT_DEBUG_CHANNEL(dnsapi);
 
 #ifdef __ANDROID__
 
+#define LIBANDROID_HANDLE "/system/lib64/libandroid.so"
+
 #include <dlfcn.h>
 enum ResNsendFlags : uint32_t {
 	ANDROID_RESOLV_NO_RETRY = 1 << 0,
@@ -79,7 +81,7 @@ static int (*p_android_res_nresult)(int fd, int *rcode, uint8_t *answer, size_t 
 
 static void init_resolver( void ) {
 	if (!libandroid_handle)
-		libandroid_handle = dlopen("libandroid.so", RTLD_LOCAL | RTLD_NOW);
+		libandroid_handle = dlopen(LIBANDROID_HANDLE, RTLD_LOCAL | RTLD_NOW);
     if (!p_android_res_nquery)
     	p_android_res_nquery = dlsym(libandroid_handle, "android_res_nquery");
     if (!p_android_res_nresult)
