@@ -420,7 +420,7 @@ static gboolean check_decoding_support(GstCaps *caps)
     /* check that the caps event has been accepted */
     if ((peer = gst_pad_get_peer(src_pad)))
     {
-        GST_ERROR("pad %"GST_PTR_FORMAT, peer);
+    	GST_INFO("pad %"GST_PTR_FORMAT, peer);
         ret = gst_pad_has_current_caps(peer);
         gst_object_unref(peer);
     }
