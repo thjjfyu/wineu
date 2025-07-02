@@ -39,6 +39,8 @@ GST_DEBUG_CATEGORY_EXTERN(wine);
 
 extern NTSTATUS wg_init_gstreamer(void *args);
 
+extern int wine_gst_no_gl;
+
 extern GstStreamType stream_type_from_caps(GstCaps *caps);
 extern GstElement *create_element(const char *name, const char *plugin_set);
 GstElement *factory_create_element(GstElementFactory *factory);
