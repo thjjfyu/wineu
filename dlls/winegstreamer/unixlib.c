@@ -47,6 +47,7 @@
 GST_DEBUG_CATEGORY(wine);
 
 GstGLDisplay *gl_display;
+int wine_gst_no_gl = -1;
 static UINT thread_count;
 
 GstStreamType stream_type_from_caps(GstCaps *caps)
@@ -325,6 +326,15 @@ NTSTATUS wg_init_gstreamer(void *arg)
     GST_INFO("GStreamer library version %s; wine built with %d.%d.%d.",
             gst_version_string(), GST_VERSION_MAJOR, GST_VERSION_MINOR, GST_VERSION_MICRO);
 
+	if (wine_gst_no_gl == -1)
+		wine_gst_no_gl = getenv("WINE_GST_NO_GL") && atoi(getenv("WINE_GST_NO_GL"));
+
+	if (wine_gst_no_gl) {
+		if (!media_converter_init())
+			return STATUS_UNSUCCESSFUL;
+		return STATUS_SUCCESS;
+	}
+	
     if (!(gl_display = gst_gl_display_new()))
         GST_ERROR("Failed to create OpenGL display");
     else

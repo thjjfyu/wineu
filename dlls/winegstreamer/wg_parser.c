@@ -2389,12 +2389,16 @@ static NTSTATUS wg_parser_create(void *args)
      * otherwise there be assertion failures, resulting in crashes. */
     {
         const char *game_id = getenv("SteamGameId");
-        if (is_kirikiri_game(game_id))
+        if (game_id && is_kirikiri_game(game_id))
             params->use_opengl = false;
     }
 
     if (!(parser = calloc(1, sizeof(*parser))))
         return E_OUTOFMEMORY;
+
+    if (wine_gst_no_gl)
+    	params->use_opengl = false;
+    	
     if ((parser->use_opengl = params->use_opengl && gl_display))
     {
         if ((parser->context = gst_context_new(GST_GL_DISPLAY_CONTEXT_TYPE, false)))
