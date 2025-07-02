@@ -23,12 +23,13 @@
 #endif
 
 #include "config.h"
-
+#include "nsi_common.h"
 #include <stdarg.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <ifaddrs.h>
 
 #ifdef HAVE_NET_IF_H
 #include <net/if.h>
@@ -104,7 +105,8 @@ struct if_entry
 
 static struct list if_list = LIST_INIT( if_list );
 static pthread_mutex_t if_list_lock = PTHREAD_MUTEX_INITIALIZER;
-
+static int do_not_update = -1;
+int wine_new_ndis = -1;
 static BOOL have_ethernet_iface;
 
 static struct if_entry *find_entry_from_index( UINT index )
@@ -309,9 +311,16 @@ static struct if_entry *add_entry( UINT index, const char *name )
         free( entry );
         return NULL;
     }
-
+#ifndef __ANDROID__
     if_get_physical( name, &entry->if_type, &entry->if_phys_addr );
-
+#else
+	if (strstr(name, "wlan") || strstr(name, "en") || strstr(name, "eth") || strstr(name, "dummy")) 
+		entry->if_type = MIB_IF_TYPE_ETHERNET;
+	else if (strstr(name, "lo"))
+		entry->if_type = MIB_IF_TYPE_LOOPBACK;
+	else if (strstr(name, "rmnet"))
+		entry->if_type = MIB_IF_TYPE_PPP;	
+#endif			
     entry->if_luid.Info.Reserved = 0;
     entry->if_luid.Info.NetLuidIndex = index;
     entry->if_luid.Info.IfType = entry->if_type;
@@ -333,12 +342,32 @@ static unsigned int update_if_table( void )
     struct if_nameindex *indices, *entry;
     unsigned int append_count = 0;
     struct if_entry *if_entry;
-    static int do_not_update = -1;
 
     if (do_not_update == -1)
         do_not_update = getenv("WINE_DO_NOT_UPDATE_IF_TABLE") && atoi(getenv("WINE_DO_NOT_UPDATE_IF_TABLE"));
 
-    if (do_not_update) return 0;
+    if (wine_new_ndis == -1)
+    	wine_new_ndis = getenv("WINE_NEW_NDIS") && atoi(getenv("WINE_NEW_NDIS"));
+
+    if (do_not_update) 
+    	return 0;
+
+    if (wine_new_ndis) {
+    	struct ifaddrs *ifap;
+    	int res;
+
+    	TRACE( "Using alternative ndis implementation, output will be limited\n" );
+
+    	if ((res = getifaddrs( &ifap )) == -1)
+    		return 0;
+    	while (ifap->ifa_next != NULL) {
+    		int index = if_nametoindex( ifap->ifa_name );
+    		if (index && !find_entry_from_index( index ) && add_entry( index, ifap->ifa_name ))
+    			++append_count;
+    		ifap = ifap->ifa_next;
+    	}
+    	return append_count; 
+    }
 
     indices = if_nameindex();
 
@@ -532,12 +561,18 @@ static NTSTATUS ifinfo_enumerate_all( void *key_data, UINT key_size, void *rw_da
     NTSTATUS status = STATUS_SUCCESS;
     BOOL want_data = key_size || rw_size || dynamic_size || static_size;
 
+
     TRACE( "%p %d %p %d %p %d %p %d %p\n", key_data, key_size, rw_data, rw_size,
            dynamic_data, dynamic_size, static_data, static_size, count );
 
     pthread_mutex_lock( &if_list_lock );
 
     update_if_table();
+
+    if (do_not_update) {
+    	pthread_mutex_unlock( &if_list_lock );
+    	return STATUS_UNSUCCESSFUL;
+    }	
 
     LIST_FOR_EACH_ENTRY( entry, &if_list, struct if_entry, entry )
     {
