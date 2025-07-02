@@ -551,7 +551,10 @@ NTSTATUS wg_transform_create(void *args)
     if (!(transform->allocator = wg_allocator_create()))
         goto out;
     transform->attrs = params->attrs;
-    transform->do_small_push = !strcmp(getenv("SteamGameId"), "255390");
+
+    const char *game_id = getenv("SteamGameId");
+    if (game_id)    
+    	transform->do_small_push = !strcmp(game_id, "255390");;
 
     if (!(transform->input_caps = caps_from_media_type(&params->input_type)))
         goto out;
