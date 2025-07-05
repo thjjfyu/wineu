@@ -210,7 +210,8 @@ struct wine_phys_dev
     uint32_t api_version;
 
     uint32_t external_memory_align;
-
+	uint32_t map_placed_align;
+	
     struct wine_vk_mapping mapping;
 };
 
@@ -273,7 +274,8 @@ struct wine_device_memory
     struct keyed_mutex_shm *keyed_mutex_shm;
     VkSemaphore keyed_mutex_sem;
     uint64_t keyed_mutex_instance_id;
-
+	VkDeviceSize size;
+	
     struct wine_vk_mapping mapping;
 };
 
