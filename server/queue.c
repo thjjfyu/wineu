@@ -2224,18 +2224,11 @@ static int queue_mouse_message( struct desktop *desktop, user_handle_t win, cons
         msg_data = &raw_msg.data;
         msg_data->info                = input->mouse.info;
         msg_data->size                = sizeof(*msg_data);
-        msg_data->flags               = flags;
+        msg_data->flags               = flags & ~(MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK);
         msg_data->rawinput.type       = RIM_TYPEMOUSE;
-        if (flags & MOUSEEVENTF_ABSOLUTE)
-        {
-            msg_data->rawinput.mouse.x    = x;
-            msg_data->rawinput.mouse.y    = y;
-        }
-        else
-        {
-            msg_data->rawinput.mouse.x    = input->mouse.x;
-            msg_data->rawinput.mouse.y    = input->mouse.y;
-        }
+        msg_data->rawinput.mouse.x    = x - desktop->shared->cursor.x;
+        msg_data->rawinput.mouse.y    = y - desktop->shared->cursor.y;
+     
         msg_data->rawinput.mouse.data = input->mouse.data;
 
         enum_processes( queue_rawinput_message, &raw_msg );
