@@ -538,12 +538,14 @@ void retry_grab_clipping_window(void)
  */
 static BOOL is_old_motion_event( unsigned long serial )
 {
+#ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
     struct x11drv_thread_data *thread_data = x11drv_thread_data();
 
     if (!thread_data->warp_serial) return FALSE;
     if ((long)(serial - thread_data->warp_serial) < 0) return TRUE;
     thread_data->warp_serial = 0;  /* we caught up now */
-    return FALSE;
+#endif
+	return FALSE;
 }
 
 
@@ -1553,7 +1555,7 @@ void move_resize_window( HWND hwnd, int dir )
             input.mi.dx          = pos.x;
             input.mi.dy          = pos.y;
             input.mi.mouseData   = button_up_data[button - 1];
-            input.mi.dwFlags     = button_up_flags[button - 1] | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE;
+            input.mi.dwFlags     = button_up_flags[button - 1] | MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
             input.mi.time        = NtGetTickCount();
             input.mi.dwExtraInfo = 0;
             __wine_send_input( hwnd, &input, NULL );
@@ -1593,7 +1595,7 @@ BOOL X11DRV_ButtonPress( HWND hwnd, XEvent *xev )
     input.mi.dx          = event->x;
     input.mi.dy          = event->y;
     input.mi.mouseData   = button_down_data[buttonNum];
-    input.mi.dwFlags     = button_down_flags[buttonNum] | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE;
+    input.mi.dwFlags     = button_down_flags[buttonNum] | MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
     input.mi.time        = x11drv_time_to_ticks( event->time );
     input.mi.dwExtraInfo = 0;
 
@@ -1620,7 +1622,7 @@ BOOL X11DRV_ButtonRelease( HWND hwnd, XEvent *xev )
     input.mi.dx          = event->x;
     input.mi.dy          = event->y;
     input.mi.mouseData   = button_up_data[buttonNum];
-    input.mi.dwFlags     = button_up_flags[buttonNum] | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE;
+    input.mi.dwFlags     = button_up_flags[buttonNum] | MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
     input.mi.time        = x11drv_time_to_ticks( event->time );
     input.mi.dwExtraInfo = 0;
 
@@ -1647,12 +1649,13 @@ BOOL X11DRV_MotionNotify( HWND hwnd, XEvent *xev )
     input.mi.dwFlags     = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
     input.mi.time        = x11drv_time_to_ticks( event->time );
     input.mi.dwExtraInfo = 0;
-
+	
     if (is_old_motion_event( event->serial ))
     {
         TRACE( "pos %d,%d old serial %lu, ignoring\n", event->x, event->y, event->serial );
         return FALSE;
     }
+    
     map_event_coords( hwnd, event->window, event->root, event->x_root, event->y_root, &input );
     send_mouse_input( hwnd, event->window, event->state, &input );
     return TRUE;
