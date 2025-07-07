@@ -1,3 +1,5 @@
+Wine source code taken from here https://github.com/bylaws/wine.git with some commits and files taken from here https://github.com/brunodev85/wine-9.2-custom and here https://github.com/AndreRH/hangover.git
+
 ## INTRODUCTION
 
 Wine is a program which allows running Microsoft Windows programs
