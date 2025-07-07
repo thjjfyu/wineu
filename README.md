@@ -1,3 +1,5 @@
+Wine source code extracted from https://github.com/ValveSoftware/wine/tree/71b75ebe1ec2a6c56f841e8b1aaf3b6d35585b45 with some commits and files taken from https://github.com/brunodev85/wine-9.2-custom/commits/main/
+
 ## INTRODUCTION
 
 Wine is a program which allows running Microsoft Windows programs
