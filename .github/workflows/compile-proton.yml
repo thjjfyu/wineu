@@ -18,7 +18,7 @@ jobs:
         wget https://github.com/Pipetto-crypto/winlator/raw/refs/heads/dev/app/src/main/assets/imagefs.txz
         tar xf imagefs.txz
         rm -rf imagefs.txz
-        chown -R $(whoami):$(whoami) .
+        sudo chown -R $(whoami):$(whoami) .
 
     - name: compile proton
       run: |
