@@ -22,6 +22,7 @@ jobs:
 
     - name: compile proton
       run: |
+       ./autogen.sh
        mkdir build
        cd build
        DEPS=../imagefs/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --configure --build --compress
