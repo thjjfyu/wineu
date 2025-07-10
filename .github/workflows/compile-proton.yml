@@ -46,17 +46,18 @@ jobs:
        echo "NDK path=${{ steps.ndk.outputs.ndk-path }}"
        ls /usr/local/lib/android/sdk/ndk
        
+    - name: run autogen.sh
+      run: ./autogen.sh
+      
     - name: compile glibc proton for wine-tools
       run: |
        mkdir wine-tools
        cd wine-tools
-       ../autogen.sh
        ../configure
        make
        
     - name: compile proton arm64ec
       run: |
-       ./autogen.sh
        mkdir build
        cd build
        DEPS=/home/runner/work/wine/wine/imagefs/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --configure --build --compress
