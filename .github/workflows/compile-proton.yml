@@ -19,7 +19,7 @@ jobs:
             libx11-dev:i386 libfreetype6-dev:i386 libgl1-mesa-dev:i386 \
             libxext-dev:i386 libxrandr-dev:i386 libxi-dev:i386 libxcursor-dev:i386 \
             libxinerama-dev:i386 libxxf86vm-dev:i386 libxrender-dev:i386 \
-            libdbus-1-dev:i386 libfontconfig1-dev:i386 gcc-mingw-w64-i686 g++-mingw-w64-i686
+            libdbus-1-dev:i386 libfontconfig1-dev:i386 build-essential
             
     - name: prepare imagefs
       run: |
@@ -63,7 +63,7 @@ jobs:
       run: |
        mkdir wine-tools
        cd wine-tools
-       ../configure --host=i686-w64-mingw32 --build=i686-pc-linux-gnu
+       CC=gcc-14 ../configure
        make
        
     - name: compile proton arm64ec
