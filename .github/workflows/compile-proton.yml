@@ -17,8 +17,8 @@ jobs:
        sudo apt update
        sudo apt install -y \
        debhelper-compat=13 \
-       gcc-mingw-w64-i686:i386 \
-       gcc-mingw-w64-x86-64 \
+       gcc-mingw-w64:i386 \
+       gcc-mingw-w64 \
        libz-mingw-w64-dev \
        lzma \
        flex \
