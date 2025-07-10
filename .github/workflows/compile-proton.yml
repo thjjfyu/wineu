@@ -42,7 +42,7 @@ jobs:
 
     - name: check ndk
       run: |
-       ls ANDROID_SDK_ROOT/ndk
+       ls /home/runner/hostedtoolcache/android-sdk-linux/latest/ndk
        
     - name: compile proton
       run: |
