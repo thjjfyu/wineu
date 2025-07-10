@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name install dependencies
+    - name: install dependencies
       run: | 
        sudo dpkg --add-architecture i386 
        sudo apt update 
