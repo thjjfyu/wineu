@@ -11,6 +11,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name install dependencies
+      run: | 
+       sudo dpkg --add-architecture i386 
+       sudo apt update 
+       sudo apt-get install -y gcc-multilib g++-multilib \
+            libx11-dev:i386 libfreetype6-dev:i386 libgl1-mesa-dev:i386 \
+            libxext-dev:i386 libxrandr-dev:i386 libxi-dev:i386 libxcursor-dev:i386 \
+            libxinerama-dev:i386 libxxf86vm-dev:i386 libxrender-dev:i386 \
+            libdbus-1-dev:i386 libfontconfig1-dev:i386
+            
     - name: prepare imagefs
       run: |
         mkdir imagefs
