@@ -14,8 +14,8 @@ jobs:
     - name: prepare imagefs
       run: |
         mkdir imagefs
-        pwd
         cd imagefs
+        pwd
         wget https://github.com/Pipetto-crypto/winlator/raw/refs/heads/dev/app/src/main/assets/imagefs.txz
         tar xf imagefs.txz
         rm -rf imagefs.txz
@@ -26,4 +26,4 @@ jobs:
        ./autogen.sh
        mkdir build
        cd build
-       DEPS=/home/runner/work/wine/imagefs/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --configure --build --compress
+       DEPS=/home/runner/work/wine/wine/imagefs/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --configure --build --compress
