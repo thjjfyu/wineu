@@ -63,7 +63,7 @@ jobs:
       run: |
        mkdir wine-tools
        cd wine-tools
-       CC=i686-w64-mingw32-gcc ../configure
+       ../configure --host=i686-w64-mingw32 --build=i686-pc-linux-gnu
        make
        
     - name: compile proton arm64ec
