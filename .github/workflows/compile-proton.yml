@@ -72,7 +72,7 @@ jobs:
       run: |
        mkdir wine-tools
        cd wine-tools
-       ../configure --enable-win64
+       ../configure --enable-win64 --disable-tests --without-capi --without-coreaudio --without-gettext --with-gettextpo=no --without-gphoto --without-inotify --without-netapi --without-opencl --without-oss --without-pcap --without-sane --without-udev --without-unwind --without-usb --without-xfixes --without-xcomposite --without-xcursor --without-xinerama --without-xinput --without-xinput2 --without-xrandr --without-xrender --without-xshape --with-xshm --without-xxf86vm --without-wayland --without-pcsclite
        make
        
     - name: compile proton arm64ec
