@@ -23,6 +23,12 @@ jobs:
         ls ./bin
         ls -l ./bin/gzip
 
+    - name: install Toolchain
+      run: |
+       wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
+       tar -xf llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
+       sudo mv llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64 /opt/llvm-mingw
+    
     - name: compile proton
       run: |
        ./autogen.sh
