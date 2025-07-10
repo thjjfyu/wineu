@@ -20,6 +20,7 @@ jobs:
         tar xf imagefs.txz
         rm -rf imagefs.txz
         sudo chown -R $(whoami):$(whoami) .
+        ls
 
     - name: compile proton
       run: |
