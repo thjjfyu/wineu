@@ -15,20 +15,76 @@ jobs:
       run: |
        sudo dpkg --add-architecture i386
        sudo apt update
-       sudo apt install -y --no-install-recommends \
-       gcc-multilib g++-multilib build-essential flex bison libtool \
-       make cmake nasm yasm autoconf automake gettext pkg-config \
-       libx11-dev libx11-dev:i386 libfreetype6-dev libfreetype6-dev:i386 \
-       libgl1-mesa-dev libgl1-mesa-dev:i386 libglu1-mesa-dev libglu1-mesa-dev:i386 \
-       libxext-dev libxext-dev:i386 libxrandr-dev libxrandr-dev:i386 \
-       libxi-dev libxi-dev:i386 libxcursor-dev libxcursor-dev:i386 \
-       libxinerama-dev libxinerama-dev:i386 libxxf86vm-dev libxxf86vm-dev:i386 \
-       libxrender-dev libxrender-dev:i386 libxcomposite-dev libxcomposite-dev:i386 \
-       libfontconfig1-dev libfontconfig1-dev:i386 libdbus-1-dev libdbus-1-dev:i386 \
-       libdrm-dev libdrm-dev:i386 libasound2-dev libasound2-dev:i386 \
-       libpulse-dev libpulse-dev:i386 \
-       zlib1g-dev zlib1g-dev:i386 libpng-dev libpng-dev:i386 \
-       libudev-dev libudev-dev:i386
+       sudo apt install -y \
+       debhelper-compat=13 \
+       gcc-mingw-w64-i686:i386 \
+       gcc-mingw-w64-x86-64:amd64 \
+       libz-mingw-w64-dev \
+       lzma \
+       flex \
+       bison \
+       quilt \
+       unzip \
+       gettext \
+       icoutils \
+       sharutils \
+       pkg-config \
+       dctrl-tools \
+       imagemagick \
+       librsvg2-bin \
+       fontforge-nox \
+       khronos-api (>= 4.6) \
+       unicode-data (>= 15) \
+       unicode-data (<< 16) \
+       unicode-idna (>= 15) \
+       unicode-idna (<< 16) \
+       libgl-dev \
+       libxi-dev \
+       libxt-dev \
+       libxmu-dev \
+       libx11-dev \
+       libxext-dev \
+       libxfixes-dev \
+       libxrandr-dev \
+       libxcursor-dev \
+       libxrender-dev \
+       libxkbfile-dev \
+       libxxf86vm-dev \
+       libxxf86dga-dev \
+       libxinerama-dev \
+       libglu1-mesa-dev \
+       libxcomposite-dev \
+       libxkbregistry-dev \
+       libxml-libxml-perl \
+       libssl-dev \
+       libv4l-dev \
+       libsdl2-dev \
+       libkrb5-dev \
+       libudev-dev \
+       libpulse-dev \
+       libldap2-dev \
+       unixodbc-dev \
+       libcups2-dev \
+       libcapi20-dev \
+       libvulkan-dev \
+       libopenal-dev \
+       libdbus-1-dev \
+       freeglut3-dev \
+       libunwind-dev \
+       libpcap0.8-dev \
+       libasound2-dev \
+       libgphoto2-dev \
+       libosmesa6-dev \
+       libncurses-dev \
+       libwayland-dev \
+       libfreetype-dev \
+       libgnutls28-dev \
+       libpcsclite-dev \
+       libusb-1.0-0-dev \
+       libgettextpo-dev \
+       libfontconfig-dev \
+       ocl-icd-opencl-dev \
+       libgstreamer-plugins-base1.0-dev
             
     - name: prepare imagefs
       run: |
@@ -72,7 +128,7 @@ jobs:
       run: |
        mkdir wine-tools
        cd wine-tools
-       ../configure --enable-win64 --disable-tests --enable-vulkan --without-capi --without-coreaudio --without-gettext --with-gettextpo=no --without-gphoto --without-inotify --without-netapi --without-opencl --without-oss --without-pcap --without-sane --without-udev --without-unwind --without-usb --without-xfixes --without-xcomposite --without-xcursor --without-xinerama --without-xinput --without-xinput2 --without-xrandr --without-xrender --without-xshape --with-xshm --without-xxf86vm --without-wayland --without-pcsclite
+       ../configure --disable-tests
        make
        
     - name: compile proton arm64ec
