@@ -98,10 +98,12 @@ jobs:
         wget https://github.com/Pipetto-crypto/winlator/raw/refs/heads/dev/app/src/main/assets/imagefs.txz
         tar xf imagefs.txz
         rm -rf imagefs.txz
+        wget https://github.com/TGP-17/wine/releases/download/include/include.tar
+        tar xf include.tar
+        rm -rf include.tar
         sudo chown -R $(whoami):$(whoami) .
-        ls ./bin
-        ls -l ./bin/gzip
-
+        ls -R ./include
+        
     - name: install Toolchain
       run: |
        wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
