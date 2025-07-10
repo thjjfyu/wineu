@@ -64,7 +64,7 @@ jobs:
        libcups2-dev \
        libcapi20-dev \
        libvulkan-dev \
-       libvulkan-dev:i368 \
+       libvulkan-dev:i386 \
        libopenal-dev \
        libdbus-1-dev \
        freeglut3-dev \
