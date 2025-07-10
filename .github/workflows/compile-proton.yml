@@ -12,14 +12,23 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: install dependencies
-      run: | 
-       sudo dpkg --add-architecture i386 
-       sudo apt update 
-       sudo apt-get install -y gcc-multilib g++-multilib libdrm-dev libdrm-dev:i386 \
-            libx11-dev:i386 libfreetype6-dev:i386 libgl1-mesa-dev:i386 \
-            libxext-dev:i386 libxrandr-dev:i386 libxi-dev:i386 libxcursor-dev:i386 \
-            libxinerama-dev:i386 libxxf86vm-dev:i386 libxrender-dev:i386 \
-            libdbus-1-dev:i386 libfontconfig1-dev:i386 build-essential
+      run: |
+       sudo dpkg --add-architecture i386
+       sudo apt update
+       sudo apt install -y --no-install-recommends \
+       gcc-multilib g++-multilib build-essential flex bison libtool \
+       make cmake nasm yasm autoconf automake gettext pkg-config \
+       libx11-dev libx11-dev:i386 libfreetype6-dev libfreetype6-dev:i386 \
+       libgl1-mesa-dev libgl1-mesa-dev:i386 libglu1-mesa-dev libglu1-mesa-dev:i386 \
+       libxext-dev libxext-dev:i386 libxrandr-dev libxrandr-dev:i386 \
+       libxi-dev libxi-dev:i386 libxcursor-dev libxcursor-dev:i386 \
+       libxinerama-dev libxinerama-dev:i386 libxxf86vm-dev libxxf86vm-dev:i386 \
+       libxrender-dev libxrender-dev:i386 libxcomposite-dev libxcomposite-dev:i386 \
+       libfontconfig1-dev libfontconfig1-dev:i386 libdbus-1-dev libdbus-1-dev:i386 \
+       libdrm-dev libdrm-dev:i386 libasound2-dev libasound2-dev:i386 \
+       libpulse-dev libpulse-dev:i386 \
+       zlib1g-dev zlib1g-dev:i386 libpng-dev libpng-dev:i386 \
+       libudev-dev libudev-dev:i386
             
     - name: prepare imagefs
       run: |
