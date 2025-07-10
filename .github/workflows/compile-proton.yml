@@ -141,4 +141,6 @@ jobs:
       run: |
        mkdir build
        cd build
-       DEPS=/home/runner/work/wine/wine/imagefs/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --configure --build --compress
+       DEPS=/home/runner/work/wine/wine/imagefs/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --configure
+       DEPS=/home/runner/work/wine/wine/imagefs/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --build
+       DEPS=/home/runner/work/wine/wine/imagefs/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --compress
