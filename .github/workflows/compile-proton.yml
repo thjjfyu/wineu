@@ -46,7 +46,14 @@ jobs:
        echo "NDK path=${{ steps.ndk.outputs.ndk-path }}"
        ls /usr/local/lib/android/sdk/ndk
        
-    - name: compile proton
+    - name: compile glibc proton for wine-tools
+      run: |
+       mkdir wine-tools
+       cd wine-tools
+       ../configure
+       make
+       
+    - name: compile proton arm64ec
       run: |
        ./autogen.sh
        mkdir build
