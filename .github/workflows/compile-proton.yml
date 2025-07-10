@@ -21,6 +21,7 @@ jobs:
         rm -rf imagefs.txz
         sudo chown -R $(whoami):$(whoami) .
         ls ./bin
+        ls -l ./bin/gzip
 
     - name: compile proton
       run: |
