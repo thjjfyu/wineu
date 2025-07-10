@@ -33,11 +33,9 @@ jobs:
        imagemagick \
        librsvg2-bin \
        fontforge-nox \
-       khronos-api (>= 4.6) \
-       unicode-data (>= 15) \
-       unicode-data (<< 16) \
-       unicode-idna (>= 15) \
-       unicode-idna (<< 16) \
+       khronos-api \
+       unicode-data \
+       unicode-idna \
        libgl-dev \
        libxi-dev \
        libxt-dev \
