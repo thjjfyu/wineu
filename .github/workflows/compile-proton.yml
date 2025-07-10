@@ -19,7 +19,7 @@ jobs:
             libx11-dev:i386 libfreetype6-dev:i386 libgl1-mesa-dev:i386 \
             libxext-dev:i386 libxrandr-dev:i386 libxi-dev:i386 libxcursor-dev:i386 \
             libxinerama-dev:i386 libxxf86vm-dev:i386 libxrender-dev:i386 \
-            libdbus-1-dev:i386 libfontconfig1-dev:i386
+            libdbus-1-dev:i386 libfontconfig1-dev:i386 gcc-mingw-w64-i686 g++-mingw-w64-i686
             
     - name: prepare imagefs
       run: |
