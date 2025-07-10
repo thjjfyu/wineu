@@ -50,6 +50,7 @@ jobs:
       run: |
        mkdir wine-tools
        cd wine-tools
+       ../autogen.sh
        ../configure
        make
        
