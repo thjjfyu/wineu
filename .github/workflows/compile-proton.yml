@@ -44,7 +44,7 @@ jobs:
       run: |
        echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
        echo "NDK path=${{ steps.ndk.outputs.ndk-path }}"
-       ls -R /usr/local/lib/android/sdk
+       ls /usr/local/lib/android/sdk/ndk
        
     - name: compile proton
       run: |
