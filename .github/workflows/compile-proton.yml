@@ -28,6 +28,17 @@ jobs:
        wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
        tar -xf llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
        sudo mv llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64 /opt/llvm-mingw
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Setup NDK
+      uses: nttld/setup-ndk@v1
+      id: ndk
+      with:
+       ndk-version: 27.0.12077973
+       add-to-path: false
+       link-to-sdk: true
     
     - name: compile proton
       run: |
