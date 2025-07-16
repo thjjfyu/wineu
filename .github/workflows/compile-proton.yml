@@ -138,7 +138,7 @@ jobs:
        mkdir wine-tools
        cd wine-tools
        ../configure --disable-tests
-       make
+       make -j$(nproc)
        
     - name: compile proton arm64ec
       run: |
