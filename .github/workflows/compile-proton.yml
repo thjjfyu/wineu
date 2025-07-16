@@ -98,11 +98,11 @@ jobs:
         wget https://github.com/Pipetto-crypto/winlator/raw/refs/heads/dev/app/src/main/assets/imagefs.txz
         tar xf imagefs.txz
         rm -rf imagefs.txz
-        wget https://github.com/TGP-17/wine/releases/download/include/include.tar
-        tar xf include.tar
-        rm -rf include.tar
+        wget https://github.com/TGP-17/wine/releases/download/include/termuxfs.tar
+        tar xf termuxfs.tar
+        rm -rf termuxfs.tar
         sudo chown -R $(whoami):$(whoami) .
-        ls -R ./include
+        ls -R ./
         
     - name: install Toolchain
       run: |
