@@ -40,6 +40,9 @@ jobs:
        libxt-dev \
        libxmu-dev \
        libx11-dev \
+       libxi-dev \
+       libxinerama-dev \
+       libxcursor-dev \
        libxext-dev \
        libxfixes-dev \
        libxrandr-dev \
