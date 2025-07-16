@@ -104,14 +104,12 @@ jobs:
         wget https://github.com/TGP-17/wine/releases/download/include/include.tar
         tar xf include.tar
         rm -rf include.tar
-        ls -R ./
         cd ../
-        ls
         sudo mkdir -p /data/data/com.winlator.cmod/files
         sudo mv ./imagefs /data/data/com.winlator.cmod/files
+        sudo ls -R /data/data/com.winlator.cmod/files
         cd /data/data
         sudo chown -R $(whoami):$(whoami) .
-        sudo ls -R /data/data
         
     - name: install Toolchain
       run: |
