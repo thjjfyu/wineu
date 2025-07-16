@@ -107,7 +107,7 @@ jobs:
         ls -R ./
         cd ../
         ls
-        sudo mkdir /data/data/com.winlator.cmod/files
+        sudo mkdir -p /data/data/com.winlator.cmod/files
         sudo mv ./imagefs /data/data/com.winlator.cmod/files
         cd /data/data
         sudo chown -R $(whoami):$(whoami) .
