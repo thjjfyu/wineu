@@ -148,6 +148,6 @@ jobs:
       run: |
        mkdir build
        cd build
-       DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --configure
-       DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --build
-       DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --compress
+       DEPS=/data/data/com.winlator.cmod/files/imagefs ARCH="aarch64" WINARCH="arm64ec" ../build.sh --configure
+       DEPS=/data/data/com.winlator.cmod/files/imagefs ARCH="aarch64" WINARCH="arm64ec" ../build.sh --build
+       DEPS=/data/data/com.winlator.cmod/files/imagefs ARCH="aarch64" WINARCH="arm64ec" ../build.sh --compress
