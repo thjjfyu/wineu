@@ -95,17 +95,23 @@ jobs:
             
     - name: prepare imagefs
       run: |
-        cd /
+        mkdir imagefs
+        cd imagefs
         pwd
-        sudo wget https://github.com/Pipetto-crypto/winlator/raw/refs/heads/dev/app/src/main/assets/imagefs.txz
-        sudo tar xf imagefs.txz
-        sudo rm -rf imagefs.txz
-        cd /data/data/com.winlator.cmod/files/imagefs
-        sudo wget https://github.com/TGP-17/wine/releases/download/include/include.tar
-        sudo tar xf include.tar
-        sudo rm -rf include.tar
-        sudo chown -R $(whoami):$(whoami) .
+        wget https://github.com/Pipetto-crypto/winlator/raw/refs/heads/dev/app/src/main/assets/imagefs.txz
+        tar xf imagefs.txz
+        rm -rf imagefs.txz
+        cd ./data/data/com.winlator.cmod/files/imagefs
+        wget https://github.com/TGP-17/wine/releases/download/include/include.tar
+        tar xf include.tar
+        rm -rf include.tar
         ls -R ./
+        cd ../../../../../
+        ls
+        sudo mv ./data /
+        cd /data/data
+        sudo chown -R $(whoami):$(whoami) .
+        sudo ls -R /data/data
         
     - name: install Toolchain
       run: |
