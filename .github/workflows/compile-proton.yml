@@ -110,6 +110,10 @@ jobs:
         sudo mv ./imagefs /data/data/com.winlator.cmod/files
         sudo ls -R /data/data/com.winlator.cmod/files
         cd /data/data
+        sudo chown -R $(whoami):$(whoami) .
+        
+    - name: install glib
+      run: |
         mkdir glib2
         cd glib2
         wget http://ports.ubuntu.com/pool/main/g/glib2.0/libglib2.0-dev_2.80.0-6ubuntu1_arm64.deb
@@ -120,7 +124,6 @@ jobs:
         echo "successfully moved"
         cd ../
         rm -rf glib2
-        sudo chown -R $(whoami):$(whoami) .
         
     - name: install Toolchain
       run: |
