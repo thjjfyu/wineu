@@ -110,6 +110,13 @@ jobs:
         sudo mv ./imagefs /data/data/com.winlator.cmod/files
         sudo ls -R /data/data/com.winlator.cmod/files
         cd /data/data
+        mkdir glib2
+        cd glib2
+        wget http://ports.ubuntu.com/pool/main/g/glib2.0/libglib2.0-dev_2.80.0-6ubuntu1_arm64.deb
+        dpkg-deb -R libglib2.0-dev_2.80.0-6ubuntu1_arm64.deb ./
+        mv ./usr/lib/aarch64-linux-gnu/glib-2.0/include/glibconfig.h /data/data/com.winlator.cmod/usr/include/glib-2.0
+        cd ../
+        rm -rf glib2
         sudo chown -R $(whoami):$(whoami) .
         
     - name: install Toolchain
