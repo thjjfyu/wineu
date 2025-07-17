@@ -120,6 +120,7 @@ jobs:
         echo "successfully downloaded"
         dpkg-deb -R libglib2.0-dev_2.80.0-6ubuntu1_arm64.deb ./
         echo "successfully installed"
+        mkdir -p /data/data/com.winlator.cmod/usr/include/glib-2.0
         mv ./usr/lib/aarch64-linux-gnu/glib-2.0/include/glibconfig.h /data/data/com.winlator.cmod/usr/include/glib-2.0
         echo "successfully moved"
         cd ../
