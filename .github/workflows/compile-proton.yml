@@ -152,3 +152,9 @@ jobs:
        DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --configure
        DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --build
        DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --compress
+
+    - name: show logs
+      if: always()
+      run: |
+       cd build
+       cat config.log | grep -e -A30 -B30 'gst.h
