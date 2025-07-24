@@ -112,20 +112,6 @@ jobs:
         cd /data/data
         sudo chown -R $(whoami):$(whoami) .
         
-    - name: install glib
-      run: |
-        mkdir glib2
-        cd glib2
-        wget http://ports.ubuntu.com/pool/main/g/glib2.0/libglib2.0-dev_2.80.0-6ubuntu1_arm64.deb
-        echo "successfully downloaded"
-        dpkg-deb -R libglib2.0-dev_2.80.0-6ubuntu1_arm64.deb ./
-        echo "successfully installed"
-        mkdir -p /data/data/com.winlator.cmod/usr/include/glib-2.0
-        mv ./usr/lib/aarch64-linux-gnu/glib-2.0/include/glibconfig.h /data/data/com.winlator.cmod/usr/include/glib-2.0
-        echo "successfully moved"
-        cd ../
-        rm -rf glib2
-        
     - name: install Toolchain
       run: |
        wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
