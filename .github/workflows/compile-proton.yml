@@ -144,10 +144,10 @@ jobs:
        cd build
        mv ../build-wine-tools.sh ./
        chmod a+x ./build-wine-tools.sh
+       ./build-wine-tools.sh
        
     - name: compile proton arm64ec
       run: |
-       mkdir build
        cd build
        DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --configure
        DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="arm64ec" ../build.sh --build
