@@ -138,12 +138,12 @@ jobs:
     - name: run autogen.sh
       run: ./autogen.sh
       
-    - name: compile glibc proton for wine-tools
+    - name: compile wine-tools
       run: |
-       mkdir wine-tools
-       cd wine-tools
-       ../configure --disable-tests
-       make -j$(nproc)
+       mkdir build
+       cd build
+       mv ../build-wine-tools.sh ./
+       chmod a+x ./build-wine-tools.sh
        
     - name: compile proton arm64ec
       run: |
