@@ -89,8 +89,7 @@ jobs:
        libgstreamer-plugins-base1.0-dev \
        libdrm2 \
        libdrm-dev \
-       build-essential \
-       gcc-multilib
+       build-essential
        
     - name: run autogen.sh
       run: ./autogen.sh
