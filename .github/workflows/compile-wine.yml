@@ -90,9 +90,6 @@ jobs:
        libdrm2 \
        libdrm-dev \
        build-essential
-       
-    - name: run autogen.sh
-      run: ./autogen.sh
       
     - name: compile wine
       run: |
