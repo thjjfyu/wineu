@@ -96,8 +96,8 @@ jobs:
        wget https://github.com/bylaws/llvm-mingw/releases/download/20240929/llvm-mingw-20240929-ucrt-ubuntu-20.04-aarch64.tar.xz
        tar xf llvm-mingw-20240929-ucrt-ubuntu-20.04-aarch64.tar.xz
        pwd
-       ls ./
-       #export PATH="<path to toolchain>/bin:$PATH"
+       ls -R ./llvm-mingw-20240929-ucrt-ubuntu-20.04-aarch64
+       export PATH="</home/runner/work/wine/wine/llvm-mingw-20240929-ucrt-ubuntu-20.04-aarch64>/bin:$PATH"
        ./configure --enable-archs=arm64ec,aarch64,i386 --prefix=/usr --with-mingw=clang --disable-tests
        make -j$(nproc)
 
