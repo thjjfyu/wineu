@@ -49,24 +49,24 @@ do
 	if [ "$arg" == "--build" ]
         then
             echo -e "Building"
-            rm -rf $HOME/wine-build
+            rm -rf ./wine-build
             rm -rf $install_dir
             make -j$(nproc) install || exit
         fi
         if [ "$arg" == "--compress" ]
         then
             echo -e "Compressing"
-            mkdir -p $HOME/wine-build/bin
-            mkdir -p $HOME/wine-build/lib
-            mkdir -p $HOME/wine-build/share
-            cp -r $install_dir/bin/wine* $HOME/wine-build/bin
-            cp -r $install_dir/bin/reg* $HOME/wine-build/bin
-            cp -r $install_dir/bin/msi* $HOME/wine-build/bin
-            cp -r $install_dir/bin/notepad $HOME/wine-build/bin
-            cp -r $install_dir/lib/wine  $HOME/wine-build/lib
-            cp -r $install_dir/share/wine  $HOME/wine-build/share
-            rm -rf $HOME/wine-build.tar.xz
-            tar -Jcf $HOME/wine-build.tar.xz -C $HOME/wine-build bin lib share
+            mkdir -p ./wine-build/bin
+            mkdir -p ./wine-build/lib
+            mkdir -p ./wine-build/share
+            cp -r $install_dir/bin/wine* ./wine-build/bin
+            cp -r $install_dir/bin/reg* ./wine-build/bin
+            cp -r $install_dir/bin/msi* ./wine-build/bin
+            cp -r $install_dir/bin/notepad ./wine-build/bin
+            cp -r $install_dir/lib/wine  ./wine-build/lib
+            cp -r $install_dir/share/wine  ./wine-build/share
+            rm -rf ./wine-build.tar.xz
+            tar -Jcf ./wine-build.tar.xz -C ./wine-build bin lib share
         fi
 done
 
