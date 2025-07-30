@@ -171,9 +171,9 @@ jobs:
     - name: compile proton arm64ec
       run: |
        cd build
-       DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="aarch64, arm64ec, i386" ../build.sh --configure
-       DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="aarch64, arm64ec, i386" ../build.sh --build
-       DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="aarch64, arm64ec, i386" ../build.sh --compress
+       DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="aarch64", "arm64ec", "i386" ../build.sh --configure
+       DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="aarch64", "arm64ec", "i386" ../build.sh --build
+       DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="aarch64", "arm64ec", "i386" ../build.sh --compress
 
     - name: tar build folder
       if: always()
