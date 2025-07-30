@@ -8,7 +8,7 @@ export deps=$DEPS
 
 export install_dir=$deps/../opt/wine
 export TOOLCHAIN=/usr/local/lib/android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin
-export LLVM_MINGW_TOOLCHAIN=$HOME/opt/llvm-mingw/bin
+export LLVM_MINGW_TOOLCHAIN=/opt/llvm-mingw/bin
 export TARGET=$ARCH-linux-android
 export WINEARCH=$WINARCH
 export PATH=$LLVM_MINGW_TOOLCHAIN:$PATH
