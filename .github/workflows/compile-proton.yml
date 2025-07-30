@@ -178,18 +178,9 @@ jobs:
        DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="aarch64,arm64ec,i386" ./build.sh --build
        DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="aarch64,arm64ec,i386" ./build.sh --compress
 
-    - name: tar build folder
-      if: always()
-      run: |
-       cd build
-       ls -R
-       cd ..
-       tar cf build.tar build/
-       ls
-
-    - name: Upload build folder
+    - name: Upload wine
       if: always()
       uses: actions/upload-artifact@v4
       with:
-       name: build.tar
-       path: ./build.tar
+       name: wine-build.tar.xz
+       path: $HOME/wine-build.tar.xz
