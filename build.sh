@@ -51,7 +51,7 @@ do
             echo -e "Building"
             rm -rf $HOME/wine-build
             rm -rf $install_dir
-            make -j4 install || exit
+            make -j$(nproc) install || exit
         fi
         if [ "$arg" == "--compress" ]
         then
