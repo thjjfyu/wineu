@@ -93,15 +93,16 @@ jobs:
       
     - name: install toolchain
       run: |
-       wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
-       tar -xf llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
-       sudo mv llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64 /opt/llvm-mingw
+       wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-aarch64.tar.xz
+       tar -xf llvm-mingw-20250305-ucrt-ubuntu-20.04-aarch64.tar.xz
+       sudo mv llvm-mingw-20250305-ucrt-ubuntu-20.04-aarch64 /opt/llvm-mingw
        cd /opt/llvm-mingw
+       ls
        sudo chown -R $(whoami):$(whoami) .
        export PATH="</opt/llvm-mingw/bin>/bin:$PATH"
-
-    - name: compile wine
-      run: |
+       cd
+       pwd
+       ls
        ./configure --enable-archs=arm64ec,aarch64,i386 --prefix=/usr --with-mingw=clang --disable-tests
        make -j$(nproc)
       
