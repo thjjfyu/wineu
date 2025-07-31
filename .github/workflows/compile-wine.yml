@@ -91,16 +91,20 @@ jobs:
        libdrm-dev \
        build-essential
       
-    - name: compile wine
+    - name: install toolchain
       run: |
-       wget https://github.com/bylaws/llvm-mingw/releases/download/20240929/llvm-mingw-20240929-ucrt-ubuntu-20.04-aarch64.tar.xz
-       tar xf llvm-mingw-20240929-ucrt-ubuntu-20.04-aarch64.tar.xz
-       pwd
-       ls -R ./llvm-mingw-20240929-ucrt-ubuntu-20.04-aarch64
-       export PATH="</home/runner/work/wine/wine/llvm-mingw-20240929-ucrt-ubuntu-20.04-aarch64>/bin:$PATH"
+       wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
+       tar -xf llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
+       sudo mv llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64 /opt/llvm-mingw
+       cd /opt/llvm-mingw
+       sudo chown -R $(whoami):$(whoami) .
+       export PATH="</opt/llvm-mingw>/bin:$PATH"
+
+    - name: install toolchain
+      run: |
        ./configure --enable-archs=arm64ec,aarch64,i386 --prefix=/usr --with-mingw=clang --disable-tests
        make -j$(nproc)
-
+      
     - name: tar build folder
       if: always()
       run: |
