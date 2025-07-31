@@ -98,9 +98,9 @@ jobs:
        sudo mv llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64 /opt/llvm-mingw
        cd /opt/llvm-mingw
        sudo chown -R $(whoami):$(whoami) .
-       export PATH="</opt/llvm-mingw>/bin:$PATH"
+       export PATH="</opt/llvm-mingw/bin>/bin:$PATH"
 
-    - name: install toolchain
+    - name: compile wine
       run: |
        ./configure --enable-archs=arm64ec,aarch64,i386 --prefix=/usr --with-mingw=clang --disable-tests
        make -j$(nproc)
