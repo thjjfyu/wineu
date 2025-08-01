@@ -103,9 +103,7 @@ jobs:
        ls
        sudo chown -R $(whoami):$(whoami) .
        export PATH="</opt/llvm-mingw/bin>/bin:$PATH"
-       cd
-       pwd
-       ls
+       cd /home/runner/work/wine/wine
        ./configure --enable-archs=arm64ec,aarch64,i386 --prefix=/usr --with-mingw=clang --disable-tests
        make -j$(nproc)
       
