@@ -144,7 +144,14 @@ jobs:
        
     - name: run autogen.sh
       run: ./autogen.sh
-      
+
+    - name: List PATH entries
+      run: |
+       echo "$PATH" | tr ':' '\n'
+    
+    - name: List all environment variables
+      run: printenv
+  
     - name: compile wine-tools
       run: |
        mkdir build
