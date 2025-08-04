@@ -157,18 +157,10 @@ jobs:
       
     - name: compile wine-tools
       run: |
-       unset ANDROID_HOME
-       unset ANDROID_SDK_ROOT
-       unset ANDROID_NDK
-       unset ANDROID_NDK_HOME
-       unset ANDROID_NDK_ROOT
-       unset ANDROID_NDK_LATEST_HOME
-       printenv
-       mkdir build
-       cd build
-       cp ../wine-tools.sh ./
-       chmod a+x ./wine-tools.sh
-       ./wine-tools.sh
+       mkdir wine-tools
+       cd wine-tools
+       ../configure --disable-tests
+       make -j$(nproc)
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
