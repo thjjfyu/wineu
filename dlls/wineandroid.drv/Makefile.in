@@ -4,7 +4,8 @@ IMPORTS   = ntoskrnl
 UNIX_LIBS = -lwin32u $(PTHREAD_LIBS)
 
 SOURCES = \
-	device.c \
+	build.gradle.in \
+        device.c \
 	dllmain.c \
 	init.c \
 	keyboard.c \
