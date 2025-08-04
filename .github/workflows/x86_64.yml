@@ -134,6 +134,23 @@ jobs:
         cd /data
         sudo chown -R $(whoami):$(whoami) .
         
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Setup NDK
+      uses: nttld/setup-ndk@v1
+      id: ndk
+      with:
+       ndk-version: r27c
+       add-to-path: false
+       link-to-sdk: true
+
+    - name: Show SDK and NDK locations
+      run: |
+       echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+       echo "NDK path=${{ steps.ndk.outputs.ndk-path }}"
+       ls /usr/local/lib/android/sdk/ndk
+       
     - name: install Toolchain
       run: |
        wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
