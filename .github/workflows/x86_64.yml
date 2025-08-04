@@ -162,13 +162,12 @@ jobs:
     - name: run autogen.sh
       run: ./autogen.sh
       
-    - name: compile wine-tools
+    - name: compile wine for wine-tools
       run: |
-       mkdir build
-       cd build
-       wget https://raw.githubusercontent.com/TGP-17/wine/refs/heads/proton-9.0-arm64ec-ci-test/build-wine-tools.sh
-       chmod a+x ./build-wine-tools.sh
-       ./build-wine-tools.sh
+       mkdir wine-tools
+       cd wine-tools
+       ../configure --disable-tests
+       make -j$(nproc)
        
     - name: compile proton x86_64
       run: |
