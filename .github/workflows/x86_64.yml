@@ -145,12 +145,13 @@ jobs:
     - name: run autogen.sh
       run: ./autogen.sh
       
-    - name: compile wine for wine-tools
+    - name: compile wine-tools
       run: |
-       mkdir wine-tools
-       cd wine-tools
-       ../configure --disable-tests
-       make -j$(nproc)
+       mkdir build
+       cd build
+       wget https://raw.githubusercontent.com/TGP-17/wine/refs/heads/proton-9.0-arm64ec-ci-test/build-wine-tools.sh
+       chmod a+x ./build-wine-tools.sh
+       ./build-wine-tools.sh
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
