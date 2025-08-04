@@ -145,6 +145,9 @@ jobs:
     - name: run autogen.sh
       run: ./autogen.sh
 
+    - name: search for build.gradle.in references
+      run: grep -r "build.gradle.in" .
+      
     - name: List PATH entries
       run: |
        echo "$PATH" | tr ':' '\n'
