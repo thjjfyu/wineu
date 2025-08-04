@@ -157,22 +157,10 @@ jobs:
       
     - name: Compile native wine-tools
       run: |
-       mkdir -p wine-tools
-       cd wine-tools
-       ../configure \
-       --disable-tests \
-       --without-x \
-       --without-oss \
-       --without-pulse \
-       --without-coreaudio \
-       --without-alsa \
-       --without-cups \
-       --without-freetype \
-       --without-gphoto \
-       --without-vulkan \
-       --without-gstreamer \
-       --without-wayland \
-       --without-dbus
+       git clone https://gitlab.winehq.org/wine/wine.git wine-upstream
+       cd wine-upstream
+       mkdir build && cd build
+       ../configure --disable-tests --without-x --without-vulkan --without-gstreamer --without-wayland
        make -j$(nproc) tools
 
     - name: Setup Android SDK
