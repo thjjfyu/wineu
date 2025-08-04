@@ -155,12 +155,25 @@ jobs:
     - name: List all environment variables
       run: printenv
       
-    - name: compile wine-tools
+    - name: Compile native wine-tools
       run: |
-       mkdir wine-tools
+       mkdir -p wine-tools
        cd wine-tools
-       ../configure --disable-tests
-       make -j$(nproc)
+       ../configure \
+       --disable-tests \
+       --without-x \
+       --without-oss \
+       --without-pulse \
+       --without-coreaudio \
+       --without-alsa \
+       --without-cups \
+       --without-freetype \
+       --without-gphoto \
+       --without-vulkan \
+       --without-gstreamer \
+       --without-wayland \
+       --without-dbus
+       make -j$(nproc) tools
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
