@@ -141,14 +141,6 @@ jobs:
        sudo mv llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64 /opt/llvm-mingw
        cd /opt/llvm-mingw
        sudo chown -R $(whoami):$(whoami) .
-
-    - name: Setup NDK
-      uses: nttld/setup-ndk@v1
-      id: ndk
-      with:
-       ndk-version: r27c
-       add-to-path: false
-       link-to-sdk: true
        
     - name: run autogen.sh
       run: ./autogen.sh
@@ -157,17 +149,17 @@ jobs:
       run: |
        mkdir build
        cd build
-       mv ../build-wine-tools.sh ./
+       wget https://raw.githubusercontent.com/TGP-17/wine/refs/heads/proton-9.0-arm64ec-ci-test/build-wine-tools.sh
        chmod a+x ./build-wine-tools.sh
        ./build-wine-tools.sh
        
-    - name: compile proton arm64ec
+    - name: compile proton x86_64
       run: |
        cd build
        mv ../build.sh ./
-       DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="aarch64,arm64ec,i386" ./build.sh --configure
-       DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="aarch64,arm64ec,i386" ./build.sh --build
-       DEPS=/data/data/com.winlator.cmod/files/imagefs/usr ARCH="aarch64" WINARCH="aarch64,arm64ec,i386" ./build.sh --compress
+       DEPS=/data/data/com.termux/files/usr ARCH="x86_64" WINARCH="x86_64,i386" ./build.sh --configure
+       DEPS=/data/data/com.termux/files/usr ARCH="x86_64" WINARCH="x86_64,i386" ./build.sh --build
+       DEPS=/data/data/com.termux/files/usr ARCH="x86_64" WINARCH="x86_64,i386" ./build.sh --compress
 
     - name: Upload wine
       if: always()
