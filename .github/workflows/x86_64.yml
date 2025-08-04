@@ -161,7 +161,7 @@ jobs:
        cd wine-upstream
        mkdir build && cd build
        ../configure --disable-tests --without-x --without-vulkan --without-gstreamer --without-wayland
-       make -j$(nproc) tools
+       make -j$(nproc)
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
