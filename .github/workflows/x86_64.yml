@@ -168,7 +168,7 @@ jobs:
        cd build
        cp ../wine-tools.sh ./
        chmod a+x ./wine-tools.sh
-       ./build-wine-tools.sh
+       ./wine-tools.sh
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
