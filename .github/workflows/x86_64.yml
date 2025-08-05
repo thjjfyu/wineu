@@ -144,16 +144,6 @@ jobs:
        
     - name: run autogen.sh
       run: ./autogen.sh
-
-    - name: search for build.gradle.in references
-      run: grep -r "build.gradle.in" .
-      
-    - name: List PATH entries
-      run: |
-       echo "$PATH" | tr ':' '\n'
-    
-    - name: List all environment variables
-      run: printenv
       
     - name: Compile native wine-tools
       run: |
@@ -174,12 +164,6 @@ jobs:
        ndk-version: r27c
        add-to-path: false
        link-to-sdk: true
-
-    - name: Show SDK and NDK locations
-      run: |
-       echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-       echo "NDK path=${{ steps.ndk.outputs.ndk-path }}"
-       ls /usr/local/lib/android/sdk/ndk
        
     - name: compile proton x86_64
       run: |
