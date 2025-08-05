@@ -69,8 +69,8 @@ static long pagesize;
 static void shm_cleanup(void)
 {
     close( shm_fd );
-    if (shm_unlink( shm_name ) == -1)
-        perror( "shm_unlink" );
+    if (unlink( shm_name ) == -1)
+        perror( "unlink" );
 }
 
 void esync_init(void)
