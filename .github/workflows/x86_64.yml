@@ -157,8 +157,9 @@ jobs:
        cd tmp
        wget https://github.com/TGP-17/wine/releases/download/wine-tools/tools.zip
        unzip tools.zip
-       mv tools ../wine-tools
-       ls ../wine-tools
+       mkdir ../wine-tools
+       mv tools ../wine-tools/tools
+       ls ../wine-tools/tools
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
