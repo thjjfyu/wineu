@@ -51,20 +51,6 @@
 
 WINE_DEFAULT_DEBUG_CHANNEL(esync);
 
-#ifdef __ANDROID__
-static int shm_open(const char *name, int oflag, mode_t mode) {
-	char *tmpdir;
-	char *fname;
-	
-	tmpdir = getenv("TMPDIR");
-	if (!tmpdir) {
-		tmpdir = "/tmp";
-	}
-	asprintf(&fname, "%s/%s", tmpdir, name);
-	return open(fname, oflag, mode);
-}
-#endif
-
 int do_esync(void)
 {
 #ifdef HAVE_SYS_EVENTFD_H
@@ -110,7 +96,7 @@ struct event
 };
 C_ASSERT(sizeof(struct event) == 8);
 
-static char shm_name[29];
+static char shm_name[256];
 static int shm_fd;
 static void **shm_addrs;
 static int shm_addrs_size;  /* length of the allocated shm_addrs array */
@@ -1346,11 +1332,11 @@ void esync_init(void)
         ERR("Cannot stat %s\n", config_dir);
 
     if (st.st_ino != (unsigned long)st.st_ino)
-        sprintf( shm_name, "/wine-%lx%08lx-esync", (unsigned long)((unsigned long long)st.st_ino >> 32), (unsigned long)st.st_ino );
+        sprintf( shm_name, "/data/data/com.winlator.cmod/files/imagefs/usr/tmp/wine-%lx%08lx-esync", (unsigned long)((unsigned long long)st.st_ino >> 32), (unsigned long)st.st_ino );
     else
-        sprintf( shm_name, "/wine-%lx-esync", (unsigned long)st.st_ino );
+        sprintf( shm_name, "/data/data/com.winlator.cmod/files/imagefs/usr/tmp/wine-%lx-esync", (unsigned long)st.st_ino );
 
-    if ((shm_fd = shm_open( shm_name, O_RDWR, 0644 )) == -1)
+    if ((shm_fd = open( shm_name, O_RDWR, 0644 )) == -1)
     {
         /* probably the server isn't running with WINEESYNC, tell the user and bail */
         if (errno == ENOENT)
