@@ -45,31 +45,6 @@
 #include "esync.h"
 #include "fsync.h"
 
-#ifdef __ANDROID__
-static int shm_open(const char *name, int oflag, mode_t mode) {
-	char *tmpdir;
-	char *fname;
-	
-	tmpdir = getenv("TMPDIR");
-	if (!tmpdir) {
-		tmpdir = "/tmp";
-	}
-	asprintf(&fname, "%s/%s", tmpdir, name);
-	return open(fname, oflag, mode);
-}
-static int shm_unlink(const char *name) {
-	char *tmpdir;
-	char *fname;
-	
-	tmpdir = getenv("TMPDIR");
-	if (!tmpdir) {
-		tmpdir = "/tmp";
-	}
-	asprintf(&fname, "%s/%s", tmpdir, name);
-	return unlink(fname);
-}
-#endif
-
 int do_esync(void)
 {
 #ifdef HAVE_SYS_EVENTFD_H
@@ -84,7 +59,7 @@ int do_esync(void)
 #endif
 }
 
-static char shm_name[29];
+static char shm_name[256];
 static int shm_fd;
 static off_t shm_size;
 static void **shm_addrs;
@@ -106,15 +81,15 @@ void esync_init(void)
         fatal_error( "cannot stat config dir\n" );
 
     if (st.st_ino != (unsigned long)st.st_ino)
-        sprintf( shm_name, "/wine-%lx%08lx-esync", (unsigned long)((unsigned long long)st.st_ino >> 32), (unsigned long)st.st_ino );
+        sprintf( shm_name, "/data/data/com.winlator.cmod/files/imagefs/usr/tmp/wine-%lx%08lx-esync", (unsigned long)((unsigned long long)st.st_ino >> 32), (unsigned long)st.st_ino );
     else
-        sprintf( shm_name, "/wine-%lx-esync", (unsigned long)st.st_ino );
+        sprintf( shm_name, "/data/data/com.winlator.cmod/files/imagefs/usr/tmp/wine-%lx-esync", (unsigned long)st.st_ino );
 
-    shm_unlink( shm_name );
+    unlink( shm_name );
 
-    shm_fd = shm_open( shm_name, O_RDWR | O_CREAT | O_EXCL, 0644 );
+    shm_fd = open( shm_name, O_RDWR | O_CREAT | O_EXCL, 0644 );
     if (shm_fd == -1)
-        perror( "shm_open" );
+        perror( "open" );
 
     pagesize = sysconf( _SC_PAGESIZE );
 
