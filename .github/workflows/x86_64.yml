@@ -184,15 +184,12 @@ jobs:
        DEPS=/data/data/com.termux/files/usr ARCH="x86_64" WINARCH="x86_64,i386" ./build.sh --build
        DEPS=/data/data/com.termux/files/usr ARCH="x86_64" WINARCH="x86_64,i386" ./build.sh --compress
 
-    - name: ls $HOME
-      run: ls -R $HOME
-
-    - name: ls /home
-      run: ls -R /home
+    - name: ls /home/runner
+      run: ls /home/runner
       
     - name: Upload wine
       if: always()
       uses: actions/upload-artifact@v4
       with:
        name: wine-build.tar.xz
-       path: $HOME/wine-build.tar.xz
+       path: /home/runner/wine-build.tar.xz
