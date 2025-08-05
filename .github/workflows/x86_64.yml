@@ -153,11 +153,13 @@ jobs:
        unset ANDROID_NDK_HOME
        unset ANDROID_NDK_ROOT
        unset ANDROID_NDK_LATEST_HOME
-       mkdir build
-       cd build
-       mv ../build-wine-tools.sh ./
-       chmod a+x build-wine-tools.sh
-       ./build-wine-tools.sh
+       mkdir tmp
+       cd tmp
+       wget https://github.com/TGP-17/wine/releases/download/wine-tools/tools.zip
+       unzip tools.zip
+       mkdir ../wine-tools
+       mv tools ../wine-tools/tools
+       ls ../wine-tools/tools
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
