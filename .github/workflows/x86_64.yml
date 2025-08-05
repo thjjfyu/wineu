@@ -147,6 +147,12 @@ jobs:
       
     - name: Compile native wine-tools
       run: |
+       unset ANDROID_HOME
+       unset ANDROID_SDK_ROOT
+       unset ANDROID_NDK
+       unset ANDROID_NDK_HOME
+       unset ANDROID_NDK_ROOT
+       unset ANDROID_NDK_LATEST_HOME
        mkdir build
        cd build
        wget https://raw.githubusercontent.com/TGP-17/wine/refs/heads/proton-9.0-arm64ec-ci-test/build-wine-tools.sh
