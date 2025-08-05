@@ -13,7 +13,7 @@ if [ "$current_dir_name" = "build" ]; then
     cd ../wine-tools-build
     
     # Prepare wine-tools-build directory and wine-tools folder
-    ../configure --without-x --without-gstreamer --without-vulkan --without-wayland
+    ../configure --without-x --without-gstreamer --without-vulkan --without-wayland --enable-wineandroid_drv=no 
     cp -r ../wine-tools-build/* ../wine-tools
     
     # Build native wine-tools
