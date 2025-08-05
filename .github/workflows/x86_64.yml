@@ -153,12 +153,9 @@ jobs:
        unset ANDROID_NDK_HOME
        unset ANDROID_NDK_ROOT
        unset ANDROID_NDK_LATEST_HOME
-       mkdir build
-       cd build
-       wget https://raw.githubusercontent.com/TGP-17/wine/refs/heads/proton-9.0-arm64ec-ci-test/build-wine-tools.sh
-       chmod a+x ./build-wine-tools.sh
-       ./build-wine-tools.sh
-       ls ../
+       wget https://github.com/TGP-17/wine/releases/download/wine-tools/tools.zip
+       unzip tools.zip
+       mv tools wine-tools
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
@@ -173,6 +170,7 @@ jobs:
        
     - name: compile proton x86_64
       run: |
+       mkdir build
        cd build
        mv ../build.sh ./
        DEPS=/data/data/com.termux/files/usr ARCH="x86_64" WINARCH="x86_64,i386" ./build.sh --configure
