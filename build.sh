@@ -13,7 +13,7 @@ export TARGET=$ARCH-linux-android
 export WINEARCH=$WINARCH
 export PATH=$LLVM_MINGW_TOOLCHAIN:$PATH
 
-export CC="$TOOLCHAIN/clang --target=$TARGET$API"
+export CC="./clang-wrapper.sh --target=$TARGET$API"
 export AS=$CC
 export CXX="$TOOLCHAIN/clang++ --target=$TARGET$API"
 export AR=$TOOLCHAIN/llvm-ar
