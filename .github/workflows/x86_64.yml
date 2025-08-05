@@ -176,6 +176,8 @@ jobs:
       run: |
        pwd
        chmod a+x clang-wrapper.sh
+       chmod a+x clang++-wrapper.sh
+       mkdir build
        cd build
        mv ../build.sh ./
        DEPS=/data/data/com.termux/files/usr ARCH="x86_64" WINARCH="x86_64,i386" ./build.sh --configure
