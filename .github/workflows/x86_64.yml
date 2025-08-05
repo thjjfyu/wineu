@@ -157,15 +157,12 @@ jobs:
       
     - name: Compile native wine-tools
       run: |
-       git clone https://gitlab.winehq.org/wine/wine.git wine-upstream
-       cd wine-upstream
        mkdir build
        cd build
        wget https://raw.githubusercontent.com/TGP-17/wine/refs/heads/proton-9.0-arm64ec-ci-test/build-wine-tools.sh
        chmod a+x ./build-wine-tools.sh
        ./build-wine-tools.sh
        ls ../
-       mv ../wine-tools ../../
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
