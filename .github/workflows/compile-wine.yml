@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
 
     steps:
     - uses: actions/checkout@v4
@@ -19,12 +19,10 @@ jobs:
       
     - name: install dependencies
       run: |
-       sudo dpkg --add-architecture i386
        sudo apt update
        sudo apt install -y \
        debhelper-compat=13 \
        gcc-mingw-w64 \
-       mingw-w64 \
        libz-mingw-w64-dev \
        lzma \
        flex \
@@ -74,7 +72,6 @@ jobs:
        libcups2-dev \
        libcapi20-dev \
        libvulkan-dev \
-       libvulkan-dev:i386 \
        libopenal-dev \
        libdbus-1-dev \
        freeglut3-dev \
@@ -95,59 +92,21 @@ jobs:
        libgstreamer-plugins-base1.0-dev \
        libdrm2 \
        libdrm-dev \
-       libdrm2:i386 \
-       libdrm-dev:i386
-
-       sudo apt-get install -y \
-       build-essential \
-       gcc-multilib \
-       libx11-dev:i386 \
-       libfreetype6-dev:i386 \
-       libxcursor-dev:i386 \
-       libxi-dev:i386 \
-       libxshmfence-dev:i386 \
-       libxxf86vm-dev:i386 \
-       libxrandr-dev:i386 \
-       libxinerama-dev:i386 \
-       libxcomposite-dev:i386 \
-       libglu1-mesa-dev:i386 \
-       libosmesa6-dev:i386 \
-       libdbus-1-dev:i386 \
-       libncurses5-dev:i386 \
-       libsane-dev:i386 \
-       libv4l-dev:i386 \
-       libgphoto2-dev:i386 \
-       liblcms2-dev:i386 \
-       libcapi20-dev:i386 \
-       libcups2-dev:i386 \
-       libfontconfig1-dev:i386 \
-       libgsm1-dev:i386 \
-       libtiff5-dev:i386 \
-       libmpg123-dev:i386 \
-       libopenal-dev:i386 \
-       libldap2-dev:i386 \
-       libjpeg-dev:i386
-
-       
-    - name: install toolchain
-      run: |
-       wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
-       tar -xf llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
-       sudo mv llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64 /opt/llvm-mingw
-       cd /opt/llvm-mingw
-       sudo chown -R $(whoami):$(whoami) .
-       
+       build-essential
+      
     - name: compile
       run: |
-       mkdir -p /home/runner/wine/wine/opt/wine
-       mkdir build
-       cd build
-       wget https://raw.githubusercontent.com/TGP-17/wine/refs/heads/compile-bylaws-wine/build.sh
-       chmod a+x ./build.sh
-       ARCH="aarch64" WINARCH="arm64ec,aarch64,i386" ./build.sh --configure
-       ARCH="aarch64" WINARCH="arm64ec,aarch64,i386" ./build.sh --build
-       ARCH="aarch64" WINARCH="arm64ec,aarch64,i386" ./build.sh --compress
-
+       wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-aarch64.tar.xz
+       tar -xf llvm-mingw-20250305-ucrt-ubuntu-20.04-aarch64.tar.xz
+       sudo mv llvm-mingw-20250305-ucrt-ubuntu-20.04-aarch64 /opt/llvm-mingw
+       cd /opt/llvm-mingw
+       ls
+       sudo chown -R $(whoami):$(whoami) .
+       export PATH="/opt/llvm-mingw/bin:$PATH"
+       cd /home/runner/work/wine/wine
+       ./configure --enable-archs=arm64ec,aarch64,i386 --prefix=/usr --with-mingw=clang --disable-tests
+       make -j$(nproc)
+      
     - name: tar build folder
       if: always()
       run: |
