@@ -102,13 +102,18 @@ jobs:
        cd /opt/llvm-mingw
        ls
        sudo chown -R $(whoami):$(whoami) .
-       export LLVM_MINGW_TOOLCHAIN=/opt/llvm-mingw/bin
-       export PATH=$LLVM_MINGW_TOOLCHAIN:$PATH
-       export DLLTOOL=$LLVM_MINGW_TOOLCHAIN/llvm-dlltool
-       cd /home/runner/work/wine/wine
-       ./configure --enable-archs=arm64ec,aarch64,i386 --prefix=/usr --with-mingw=clang --disable-tests
-       make -j$(nproc)
-      
+       
+    - name: compile
+      run: |
+       mkdir -p /home/runner/wine/wine/opt/wine
+       mkdir build
+       cd build
+       mv build.sh ./
+       chmod a+x ./build.sh
+       ARCH="aarch64" WINARCH="arm64ec,aarch64,i386" ./build.sh --configure
+       ARCH="aarch64" WINARCH="arm64ec,aarch64,i386" ./build.sh --build
+       ARCH="aarch64" WINARCH="arm64ec,aarch64,i386" ./build.sh --compress
+
     - name: tar build folder
       if: always()
       run: |
