@@ -117,17 +117,19 @@ jobs:
        cd /home/runner/work/wine/wine
        ./configure --enable-archs=arm64ec,aarch64,i386 --prefix=/usr --with-mingw=clang --disable-tests
        make -j$(nproc)
+       mkdir ./Wine-Build
+       sudo make install -j$(nproc) DESTDIR=./Wine-Build
       
     - name: tar build folder
       if: always()
       run: |
        ls -R
-       tar cf build.tar build/
+       tar cf Wine-Build.tar Wine-Build/
        ls
 
     - name: Upload build folder
       if: always()
       uses: actions/upload-artifact@v4
       with:
-       name: build.tar
-       path: ./build.tar
+       name: Wine-Build.tar
+       path: ./Wine-Build.tar
