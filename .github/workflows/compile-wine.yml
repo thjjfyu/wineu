@@ -94,11 +94,17 @@ jobs:
        libdrm-dev \
        build-essential
       
-    - name: compile
+    - name: Install Clang 20
       run: |
        wget https://apt.llvm.org/llvm.sh
        chmod +x llvm.sh
        sudo ./llvm.sh 20
+       sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-20 100
+       sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-20 100
+       clang --version
+
+    - name: Compile Wine
+      run: |
        ./configure --enable-archs=arm64ec,aarch64,i386 --prefix=/usr --with-mingw=clang --disable-tests
        make -j$(nproc)
       
