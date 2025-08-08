@@ -24,6 +24,7 @@ jobs:
        sudo apt install -y \
        debhelper-compat=13 \
        gcc-mingw-w64 \
+       mingw-w64 \
        libz-mingw-w64-dev \
        lzma \
        flex \
