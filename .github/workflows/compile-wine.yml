@@ -3,6 +3,7 @@ name: arm64ec
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
