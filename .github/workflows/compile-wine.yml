@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
 
     steps:
     - uses: actions/checkout@v4
@@ -130,11 +130,10 @@ jobs:
        
     - name: install toolchain
       run: |
-       wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-aarch64.tar.xz
-       tar -xf llvm-mingw-20250305-ucrt-ubuntu-20.04-aarch64.tar.xz
-       sudo mv llvm-mingw-20250305-ucrt-ubuntu-20.04-aarch64 /opt/llvm-mingw
+       wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
+       tar -xf llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64.tar.xz
+       sudo mv llvm-mingw-20250305-ucrt-ubuntu-20.04-x86_64 /opt/llvm-mingw
        cd /opt/llvm-mingw
-       ls
        sudo chown -R $(whoami):$(whoami) .
        
     - name: compile
