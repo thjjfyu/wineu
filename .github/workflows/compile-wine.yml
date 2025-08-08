@@ -19,6 +19,7 @@ jobs:
       
     - name: install dependencies
       run: |
+       sudo dpkg --add-architecture i386
        sudo apt update
        sudo apt install -y \
        debhelper-compat=13 \
@@ -72,6 +73,7 @@ jobs:
        libcups2-dev \
        libcapi20-dev \
        libvulkan-dev \
+       libvulkan-dev:i386 \
        libopenal-dev \
        libdbus-1-dev \
        freeglut3-dev \
@@ -92,8 +94,40 @@ jobs:
        libgstreamer-plugins-base1.0-dev \
        libdrm2 \
        libdrm-dev \
-       build-essential
-      
+       libdrm2:i386 \
+       libdrm-dev:i386
+
+       sudo apt-get install -y \
+       build-essential \
+       gcc-multilib \
+       libx11-dev:i386 \
+       libfreetype6-dev:i386 \
+       libxcursor-dev:i386 \
+       libxi-dev:i386 \
+       libxshmfence-dev:i386 \
+       libxxf86vm-dev:i386 \
+       libxrandr-dev:i386 \
+       libxinerama-dev:i386 \
+       libxcomposite-dev:i386 \
+       libglu1-mesa-dev:i386 \
+       libosmesa6-dev:i386 \
+       libdbus-1-dev:i386 \
+       libncurses5-dev:i386 \
+       libsane-dev:i386 \
+       libv4l-dev:i386 \
+       libgphoto2-dev:i386 \
+       liblcms2-dev:i386 \
+       libcapi20-dev:i386 \
+       libcups2-dev:i386 \
+       libfontconfig1-dev:i386 \
+       libgsm1-dev:i386 \
+       libtiff5-dev:i386 \
+       libmpg123-dev:i386 \
+       libopenal-dev:i386 \
+       libldap2-dev:i386 \
+       libjpeg-dev:i386
+
+       
     - name: install toolchain
       run: |
        wget https://github.com/bylaws/llvm-mingw/releases/download/20250305/llvm-mingw-20250305-ucrt-ubuntu-20.04-aarch64.tar.xz
