@@ -108,7 +108,7 @@ jobs:
        mkdir -p /home/runner/wine/wine/opt/wine
        mkdir build
        cd build
-       mv build.sh ./
+       wget https://raw.githubusercontent.com/TGP-17/wine/refs/heads/compile-bylaws-wine/build.sh
        chmod a+x ./build.sh
        ARCH="aarch64" WINARCH="arm64ec,aarch64,i386" ./build.sh --configure
        ARCH="aarch64" WINARCH="arm64ec,aarch64,i386" ./build.sh --build
