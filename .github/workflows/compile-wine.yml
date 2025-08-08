@@ -107,6 +107,9 @@ jobs:
 
     - name: Compile Wine
       run: |
+       wget https://github.com/mstorsjo/llvm-mingw/releases/download/20250730/llvm-mingw-20250730-ucrt-ubuntu-22.04-aarch64.tar.xz
+       tar xf llvm-mingw-20250730-ucrt-ubuntu-22.04-aarch64.tar.xz
+       mv llvm-mingw-20250730-ucrt-ubuntu-22.04-aarch64 /opt/llvm-mingw
        ./configure --enable-archs=arm64ec,aarch64,i386 --prefix=/usr --with-mingw=clang --disable-tests
        make -j$(nproc)
       
