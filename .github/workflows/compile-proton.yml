@@ -112,7 +112,7 @@ jobs:
     - name: compile proton
       run: |
        export PATH="/opt/llvm-mingw/bin:$PATH"
-       ./configure --enable-archs=arm64ec,aarch64,i386 --prefix=/usr --with-mingw=clang --disable-tests
+       ./configure --enable-archs=arm64ec,aarch64,i386 --prefix=/usr --with-mingw=clang --disable-tests --with-pulse --with-ffmpeg --without-gstreamer --with-pthread --without-dbus --with-freetype --enable-wineandroid_drv=no --without-cups --without-v4l2 --enable-nls --without-capi --without-coreaudio --without-gettext --with-gettextpo=no --without-gphoto --without-inotify --without-netapi --without-opencl --without-oss --without-pcap --without-sane --without-udev --without-unwind --without-usb --without-xfixes --without-xcomposite --with-xcursor --without-xinerama --without-xinput --without-xinput2 --without-xrandr --without-xrender --without-xshape --with-xshm --without-xxf86vm --without-wayland --without-pcsclite
        make -j$(nproc)
        mkdir ./Wine-Build
        sudo make install -j$(nproc) DESTDIR=./Wine-Build
