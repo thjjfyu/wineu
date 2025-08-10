@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-22.04-arm
 
     steps:
     - uses: actions/checkout@v4
@@ -90,7 +90,6 @@ jobs:
       
     - name: Install Clang 20
       run: |
-       sudo apt remove -y clang-18 llvm-18
        wget https://apt.llvm.org/llvm.sh
        chmod +x llvm.sh
        sudo ./llvm.sh 20
