@@ -33,7 +33,6 @@ jobs:
        fontforge-nox \
        khronos-api \
        unicode-data \
-       unicode-idna \
        libgl-dev \
        libxi-dev \
        libxt-dev \
