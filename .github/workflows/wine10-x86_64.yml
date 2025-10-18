@@ -49,11 +49,21 @@ jobs:
           libwayland-dev \
           libxkbcommon-dev \
           python3-dev \
-          ccache
+          ccache \
+          autoconf \
+          automake \
+          libtool
         
         # Установить GCC 13 как default
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
+    
+    - name: Generate configure script
+      run: |
+        echo "🔧 Generating configure script..."
+        ./tools/make_requests
+        autoreconf -fiv
+        echo "✅ Configure script generated!"
     
     - name: Setup Android NDK
       uses: nttld/setup-ndk@v1
