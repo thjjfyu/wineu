@@ -1,0 +1,170 @@
+name: Build Wine 10.0 x86_64 for Winlator
+
+on:
+  push:
+    branches: [ wine-10.0-android, wine-10.0-x86_64 ]
+  pull_request:
+    branches: [ wine-10.0-android ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 1
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          gcc-13 g++-13 \
+          clang-17 \
+          flex bison \
+          gettext \
+          libvulkan-dev \
+          vulkan-validationlayers-dev \
+          libgnutls28-dev \
+          libwayland-dev \
+          libxkbcommon-dev \
+          python3-dev \
+          ccache
+        
+        # Установить GCC 13 как default
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
+    
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
+    
+    - name: Setup Android NDK r26c
+      run: |
+        ANDROID_SDK_ROOT=$HOME/Android/Sdk
+        NDK_VERSION=26.1.10909125
+        
+        echo "y" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
+          "ndk;$NDK_VERSION" \
+          "platforms;android-28" \
+          "build-tools;34.0.0"
+        
+        echo "ANDROID_NDK=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION" >> $GITHUB_ENV
+        echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+    
+    - name: Cache Wine build
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.ccache
+          build/
+        key: wine10-${{ runner.os }}-${{ github.sha }}
+        restore-keys: |
+          wine10-${{ runner.os }}-
+    
+    - name: Configure Wine 10
+      run: |
+        export ANDROID_API=28
+        export TOOLCHAIN=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64
+        
+        export CC="$TOOLCHAIN/bin/x86_64-linux-android$ANDROID_API-clang"
+        export CXX="$TOOLCHAIN/bin/x86_64-linux-android$ANDROID_API-clang++"
+        export AR="$TOOLCHAIN/bin/llvm-ar"
+        export RANLIB="$TOOLCHAIN/bin/llvm-ranlib"
+        export STRIP="$TOOLCHAIN/bin/llvm-strip"
+        
+        mkdir -p build && cd build
+        
+        ../configure \
+          --host=x86_64-linux-android \
+          --prefix=/data/data/com.winlator/files/wine \
+          --enable-win64 \
+          --with-vulkan \
+          --without-x \
+          --without-freetype \
+          --without-fontconfig \
+          --without-xinerama \
+          --without-xinput \
+          --without-xrandr \
+          --without-xrender \
+          --without-xshape \
+          --without-xshm \
+          --disable-tests \
+          CFLAGS="-O3 -fPIC -DANDROID -march=x86-64 -mtune=generic" \
+          CXXFLAGS="-O3 -fPIC -DANDROID -march=x86-64 -mtune=generic" \
+          LDFLAGS="-Wl,-rpath-link=$TOOLCHAIN/sysroot/usr/lib"
+    
+    - name: Build Wine 10
+      run: |
+        cd build
+        make -j$(nproc) || make -j2
+    
+    - name: Install Wine 10
+      run: |
+        cd build
+        make install DESTDIR=$GITHUB_WORKSPACE/wine-10-install
+    
+    - name: Package Wine 10
+      run: |
+        cd wine-10-install
+        
+        # Создать структуру для Winlator
+        mkdir -p winlator-wine10/{bin,lib,share}
+        
+        # Копировать только нужные файлы
+        find . -name "*.so" -exec cp --parents {} winlator-wine10/ \;
+        find . -name "wine*" -type f -executable -exec cp --parents {} winlator-wine10/ \;
+        
+        # Упаковать
+        cd winlator-wine10
+        tar -czf ../../wine-10.0-x86_64-android.tar.gz .
+        cd ../..
+        
+        # Создать версию в формате .txz для Winlator
+        cd wine-10-install/winlator-wine10
+        tar -cJf ../../wine-10.0-x86_64.txz .
+        cd ../..
+        
+        # Информация о сборке
+        echo "📦 Wine 10.0 для Winlator собран!"
+        echo "📊 Размер:"
+        ls -lh wine-10.0-x86_64-android.tar.gz wine-10.0-x86_64.txz
+    
+    - name: Upload artifact (.tar.gz)
+      uses: actions/upload-artifact@v3
+      with:
+        name: wine-10.0-x86_64-android
+        path: wine-10.0-x86_64-android.tar.gz
+    
+    - name: Upload artifact (.txz for Winlator)
+      uses: actions/upload-artifact@v3
+      with:
+        name: wine-10.0-x86_64-winlator
+        path: wine-10.0-x86_64.txz
+    
+    - name: Create Release (on tag)
+      if: startsWith(github.ref, 'refs/tags/v')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          wine-10.0-x86_64-android.tar.gz
+          wine-10.0-x86_64.txz
+        body: |
+          ## Wine 10.0 для Winlator Android
+          
+          ### Изменения:
+          - 🍷 Wine 10.0 official base
+          - ✨ Modernized UI V2 (Segoe UI, 290px, 24px buttons)
+          - 🎮 Wine-Staging patches
+          - 📱 Android compatibility patches
+          - 🚀 Optimized for x86_64
+          
+          ### Установка в Winlator:
+          1. Скачать `wine-10.0-x86_64.txz`
+          2. В Winlator: Settings → Wine version → Import
+          3. Выбрать скачанный файл
+          
+          ### Размер: ~60-70 MB
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
