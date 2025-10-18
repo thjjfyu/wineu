@@ -1,0 +1,9 @@
+Wine 10.0 Build Started
+
+This will:
+1. Download Wine 10.0 from winehq.org
+2. Replace code with Wine 10.0 source
+3. Build for Android x86_64
+4. Package as wine-10.0-x86_64.txz
+
+Time: ~45 minutes
