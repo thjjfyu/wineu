@@ -33,7 +33,7 @@ jobs:
           python3-dev \
           ccache
         
-        # Установить GCC 13 как default
+        # РЈСЃС‚Р°РЅРѕРІРёС‚СЊ GCC 13 РєР°Рє default
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
     
@@ -109,26 +109,26 @@ jobs:
       run: |
         cd wine-10-install
         
-        # Создать структуру для Winlator
+        # РЎРѕР·РґР°С‚СЊ СЃС‚СЂСѓРєС‚СѓСЂСѓ РґР»СЏ Winlator
         mkdir -p winlator-wine10/{bin,lib,share}
         
-        # Копировать только нужные файлы
+        # РљРѕРїРёСЂРѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ РЅСѓР¶РЅС‹Рµ С„Р°Р№Р»С‹
         find . -name "*.so" -exec cp --parents {} winlator-wine10/ \;
         find . -name "wine*" -type f -executable -exec cp --parents {} winlator-wine10/ \;
         
-        # Упаковать
+        # РЈРїР°РєРѕРІР°С‚СЊ
         cd winlator-wine10
         tar -czf ../../wine-10.0-x86_64-android.tar.gz .
         cd ../..
         
-        # Создать версию в формате .txz для Winlator
+        # РЎРѕР·РґР°С‚СЊ РІРµСЂСЃРёСЋ РІ С„РѕСЂРјР°С‚Рµ .txz РґР»СЏ Winlator
         cd wine-10-install/winlator-wine10
         tar -cJf ../../wine-10.0-x86_64.txz .
         cd ../..
         
-        # Информация о сборке
-        echo "📦 Wine 10.0 для Winlator собран!"
-        echo "📊 Размер:"
+        # РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃР±РѕСЂРєРµ
+        echo "рџ“¦ Wine 10.0 РґР»СЏ Winlator СЃРѕР±СЂР°РЅ!"
+        echo "рџ“Љ Р Р°Р·РјРµСЂ:"
         ls -lh wine-10.0-x86_64-android.tar.gz wine-10.0-x86_64.txz
     
     - name: Upload artifact (.tar.gz)
@@ -151,20 +151,20 @@ jobs:
           wine-10.0-x86_64-android.tar.gz
           wine-10.0-x86_64.txz
         body: |
-          ## Wine 10.0 для Winlator Android
+          ## Wine 10.0 РґР»СЏ Winlator Android
           
-          ### Изменения:
-          - 🍷 Wine 10.0 official base
-          - ✨ Modernized UI V2 (Segoe UI, 290px, 24px buttons)
-          - 🎮 Wine-Staging patches
-          - 📱 Android compatibility patches
-          - 🚀 Optimized for x86_64
+          ### РР·РјРµРЅРµРЅРёСЏ:
+          - рџЌ· Wine 10.0 official base
+          - вњЁ Modernized UI V2 (Segoe UI, 290px, 24px buttons)
+          - рџЋ® Wine-Staging patches
+          - рџ“± Android compatibility patches
+          - рџљЂ Optimized for x86_64
           
-          ### Установка в Winlator:
-          1. Скачать `wine-10.0-x86_64.txz`
-          2. В Winlator: Settings → Wine version → Import
-          3. Выбрать скачанный файл
+          ### РЈСЃС‚Р°РЅРѕРІРєР° РІ Winlator:
+          1. РЎРєР°С‡Р°С‚СЊ `wine-10.0-x86_64.txz`
+          2. Р’ Winlator: Settings в†’ Wine version в†’ Import
+          3. Р’С‹Р±СЂР°С‚СЊ СЃРєР°С‡Р°РЅРЅС‹Р№ С„Р°Р№Р»
           
-          ### Размер: ~60-70 MB
+          ### Р Р°Р·РјРµСЂ: ~60-70 MB
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
