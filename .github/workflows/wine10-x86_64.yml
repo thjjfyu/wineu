@@ -151,13 +151,13 @@ jobs:
         ls -lh wine-10.0-x86_64-android.tar.gz wine-10.0-x86_64.txz
     
     - name: Upload artifact (.tar.gz)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: wine-10.0-x86_64-android
         path: wine-10.0-x86_64-android.tar.gz
     
     - name: Upload artifact (.txz for Winlator)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: wine-10.0-x86_64-winlator
         path: wine-10.0-x86_64.txz
