@@ -55,21 +55,12 @@ jobs:
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
     
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
-    
-    - name: Setup Android NDK r26c
-      run: |
-        ANDROID_SDK_ROOT=$HOME/Android/Sdk
-        NDK_VERSION=26.1.10909125
-        
-        echo "y" | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager \
-          "ndk;$NDK_VERSION" \
-          "platforms;android-28" \
-          "build-tools;34.0.0"
-        
-        echo "ANDROID_NDK=$ANDROID_SDK_ROOT/ndk/$NDK_VERSION" >> $GITHUB_ENV
-        echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+    - name: Setup Android NDK
+      uses: nttld/setup-ndk@v1
+      id: setup-ndk
+      with:
+        ndk-version: r26c
+        add-to-path: true
     
     - name: Cache Wine build
       uses: actions/cache@v3
@@ -84,6 +75,7 @@ jobs:
     - name: Configure Wine 10
       run: |
         export ANDROID_API=28
+        export ANDROID_NDK="${{ steps.setup-ndk.outputs.ndk-path }}"
         export TOOLCHAIN=$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64
         
         export CC="$TOOLCHAIN/bin/x86_64-linux-android$ANDROID_API-clang"
