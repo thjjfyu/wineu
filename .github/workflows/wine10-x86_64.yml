@@ -45,7 +45,6 @@ jobs:
           flex bison \
           gettext \
           libvulkan-dev \
-          vulkan-validationlayers-dev \
           libgnutls28-dev \
           libwayland-dev \
           libxkbcommon-dev \
