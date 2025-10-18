@@ -1,4 +1,4 @@
-ame: Build Wine 10.0 x86_64 for Winlator
+name: Build Wine 10.0 x86_64 for Winlator
 
 on:
   push:
@@ -24,10 +24,15 @@ jobs:
         echo "📦 Extracting Wine 10.0..."
         tar -xf wine-10.0.tar.xz
         echo "🔄 Replacing repository code with Wine 10.0..."
-        shopt -s dotglob
-        rm -rf *
-        mv wine-10.0/* .
+        # Сохраняем .github директорию
+        mv .github /tmp/.github-backup
+        # Удаляем всё кроме скрытых файлов
+        find . -mindepth 1 -maxdepth 1 ! -name '.' ! -name '..' ! -name '.git' -exec rm -rf {} +
+        # Перемещаем Wine 10.0
+        mv wine-10.0/* wine-10.0/.* . 2>/dev/null || true
         rm -rf wine-10.0 wine-10.0.tar.xz
+        # Восстанавливаем .github
+        mv /tmp/.github-backup .github
         echo "✅ Wine 10.0 source ready!"
         ls -la | head -20
     
